@@ -37,7 +37,9 @@ Char task0Stack[TASKSTACKSIZE];
 #define LED_ONTIME_MS                               100
 
 /* Runtime Events */
-#define EVENT_STATECHANGE Event_Id_00
+#define EVENT_STATECHANGE   Event_Id_00
+#define EVENT_BUTTONPRESSED Event_Id_01
+
 static Event_Struct runtimeEventsStruct;
 static Event_Handle runtimeEvents;
 
@@ -174,7 +176,8 @@ static enum eDeviceState
     DEVICE_STATE_JOIN,
     DEVICE_STATE_SEND,
     DEVICE_STATE_CYCLE,
-    DEVICE_STATE_SLEEP
+    DEVICE_STATE_SLEEP,
+    DEVICE_STATE_BUTTON
 }DeviceState;
 
 /*!
@@ -637,6 +640,11 @@ static void MlmeConfirm( MlmeConfirm_t *mlmeConfirm )
     Event_post(runtimeEvents, EVENT_STATECHANGE);
 }
 
+
+static void ButtonCallback(void) {
+    Event_post(runtimeEvents, EVENT_BUTTONPRESSED);
+}
+
 void maintask(UArg arg0, UArg arg1)
 {
     LoRaMacPrimitives_t LoRaMacPrimitives;
@@ -667,7 +675,7 @@ void maintask(UArg arg0, UArg arg1)
 
                 TimerInit( &TxNextPacketTimer, OnTxNextPacketTimerEvent );
                 // Listen for button press to trigger next packet instead of timer
-                setBtnCallback(OnTxNextPacketTimerEvent);
+                setBtnCallback(ButtonCallback);
 
                 TimerInit( &Led1Timer, OnLed1TimerEvent );
                 TimerSetValue( &Led1Timer, LED_ONTIME_MS );
@@ -781,7 +789,42 @@ void maintask(UArg arg0, UArg arg1)
             {
                 debugprintf("# DeviceState: DEVICE_STATE_SLEEP\n");
                 // Wake up through events
-                Event_pend(runtimeEvents, Event_Id_NONE, EVENT_STATECHANGE, BIOS_WAIT_FOREVER);
+                UInt events = Event_pend(runtimeEvents, Event_Id_NONE, EVENT_STATECHANGE|EVENT_BUTTONPRESSED, BIOS_WAIT_FOREVER);
+                // If only button press event (priority to STATECHANGE)
+                if (events == EVENT_BUTTONPRESSED) {
+                    DeviceState = DEVICE_STATE_BUTTON;
+                }
+                break;
+            }
+            case DEVICE_STATE_BUTTON:
+            {
+                debugprintf("# DeviceState: DEVICE_STATE_BUTTON\n");
+
+                DeviceState = DEVICE_STATE_SLEEP;
+
+                MibRequestConfirm_t mibReq;
+                LoRaMacStatus_t status;
+
+                mibReq.Type = MIB_NETWORK_JOINED;
+                status = LoRaMacMibGetRequestConfirm( &mibReq );
+
+                if( status == LORAMAC_STATUS_OK )
+                {
+                    if( mibReq.Param.IsNetworkJoined == true )
+                    {
+                        DeviceState = DEVICE_STATE_SEND;
+                        NextTx = true;
+                    }
+                    else
+                    {
+                        DeviceState = DEVICE_STATE_JOIN;
+                        SendOnJoin = true;
+                    }
+                }
+                setLed(Board_RLED, 1);
+                TimerStart( &Led2Timer );
+
+                setLed(Board_GLED, 1); // denote busy - turned off on send confirm
                 break;
             }
             default:
