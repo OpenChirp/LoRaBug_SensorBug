@@ -42,6 +42,9 @@ static PIN_Handle btnPinHandle;
 static PIN_State btnPinState;
 static void (*btnCallback)(void) = NULL;
 
+static PIN_State uartSensePinState;
+static PIN_Handle uartSensePinHandle;
+
 /* Clock used for debounce logic */
 static Clock_Struct buttonClock;
 static Clock_Handle hButtonClock;
@@ -59,13 +62,13 @@ static char uartlinebuf[UART_RECV_LINE_LENGTH + 1]; // +1 for '\0'
  * Application LED pin configuration table:
  *   - All LEDs board LEDs are off.
  */
-PIN_Config ledPinTable[] = {
+static PIN_Config ledPinTable[] = {
         Board_GLED | PIN_GPIO_OUTPUT_EN | PIN_GPIO_LOW | PIN_PUSHPULL | PIN_DRVSTR_MAX,
         Board_RLED | PIN_GPIO_OUTPUT_EN | PIN_GPIO_LOW | PIN_PUSHPULL | PIN_DRVSTR_MAX,
         PIN_TERMINATE
 };
 
-PIN_Config hdrPinTable[] = {
+static PIN_Config hdrPinTable[] = {
 //     Board_HDR_HDIO0 | PIN_GPIO_OUTPUT_EN | PIN_GPIO_LOW | PIN_PUSHPULL | PIN_DRVSTR_MAX,
 //     Board_HDR_HDIO1 | PIN_GPIO_OUTPUT_EN | PIN_GPIO_LOW | PIN_PUSHPULL | PIN_DRVSTR_MAX,
 //     Board_HDR_HDIO2 | PIN_GPIO_OUTPUT_EN | PIN_GPIO_LOW | PIN_PUSHPULL | PIN_DRVSTR_MAX,
@@ -80,13 +83,13 @@ PIN_Config hdrPinTable[] = {
         PIN_TERMINATE
 };
 
-PIN_Config btnPinTable[] = {
+static PIN_Config btnPinTable[] = {
         Board_BTN | PIN_INPUT_EN | PIN_NOPULL | PIN_HYSTERESIS | PIN_IRQ_NEGEDGE,
         PIN_TERMINATE
 };
 
-PIN_Config uartSensePinTable[] = {
-        Board_UART_RX | PIN_INPUT_EN | PIN_PULLDOWN,
+static PIN_Config uartSensePinTable[] = {
+        Board_UART_RX | PIN_INPUT_EN | PIN_NOPULL | PIN_HYSTERESIS | PIN_IRQ_POSEDGE,
         PIN_TERMINATE
 };
 
@@ -186,47 +189,61 @@ void setuppins()
 //    }
 }
 
+/**
+ * @note This routine should not race with the uartsetup function because the interrupt
+ *       is only registered after we decide not to call uartopen.
+ */
+static void uartopen() {
+    if (uartHandle == NULL)
+    {
+        PIN_registerIntCb(uartSensePinHandle, NULL);
+        PIN_setConfig(uartSensePinHandle, PIN_BM_IRQ|PIN_BM_PULLING, Board_UART_RX|PIN_IRQ_DIS|PIN_NOPULL);
+        PIN_close(uartSensePinHandle);
+
+        UART_Params uartParams;
+        UART_Params_init(&uartParams);
+        uartParams.baudRate = 115200; // 3000000
+        uartParams.readMode = UART_MODE_BLOCKING;
+        uartParams.writeMode = UART_MODE_BLOCKING;
+        // UARTCC26xx does not implement any of these parameters
+        //    uartParams.readDataMode = UART_DATA_TEXT;
+        //    uartParams.writeDataMode = UART_DATA_TEXT;
+        //    uartParams.readReturnMode = UART_RETURN_NEWLINE;
+        //    uartParams.readEcho = UART_ECHO_ON;
+        uartHandle = UART_open(Board_UART, &uartParams);
+        if (!uartHandle)
+        {
+            System_abort("Failed to open UART\n");
+        }
+    }
+}
+
+/**
+ * This callback is intended for the one time setup of UART,
+ * in the event that USB is ever plugged in.
+ */
+static void uartRxIntCallback(PIN_Handle handle, PIN_Id pinId)
+{
+    uartopen();
+}
+
 void setupuart()
 {
     GateMutexPri_construct(&uartMutexStruct, NULL);
 
-//    PIN_State uartSenseState;
-//    PIN_Handle uartSenseHandle = PIN_open(&uartSenseState, uartSensePinTable);
-//    if (uartSenseHandle == NULL)
-//    {
-//        System_abort("Failed to open UART sense pins\n");
-//    }
-//    int rxSense = PIN_getInputValue(Board_UART_RX);
-//    PIN_close(uartSenseHandle);
-//
-//    printf("rxSense = %d\n", rxSense);
-//
-//    if (rxSense == 0) {
-//        // If no USB plugged in do not setup UART paripheral
-//        return;
-//    }
-
-    UART_Params uartParams;
-    UART_Params_init(&uartParams);
-    uartParams.baudRate = 115200; // 3000000
-    uartParams.readMode = UART_MODE_BLOCKING;
-    uartParams.writeMode = UART_MODE_BLOCKING;
-    // UARTCC26xx does not implement any of these parameters
-//    uartParams.readDataMode = UART_DATA_TEXT;
-//    uartParams.writeDataMode = UART_DATA_TEXT;
-//    uartParams.readReturnMode = UART_RETURN_NEWLINE;
-//    uartParams.readEcho = UART_ECHO_ON;
-    uartHandle = UART_open(Board_UART, &uartParams);
-    if (!uartHandle)
+    uartSensePinHandle = PIN_open(&uartSensePinState, uartSensePinTable);
+    if (uartSensePinHandle == NULL)
     {
-        System_abort("Failed to open UART\n");
+        System_abort("Failed to open UART sense pins\n");
     }
 
-//    // Initialize the logger output
-//    UartLog_init(hUart);
-//    UartPrintf_init()
+    int val = PIN_getInputValue(PIN_ID(Board_UART_RX));
+    if (val == 1) {
+        uartopen();
+    } else {
+        PIN_registerIntCb(uartSensePinHandle, uartRxIntCallback);
+    }
 
-    uartprintf("SETUP UART\n");
 }
 
 void uartwrite(const char *str, size_t size)
@@ -264,21 +281,26 @@ void uartputs(const char *str)
     GateMutexPri_leave(GateMutexPri_handle(&uartMutexStruct), key);
 }
 
-void uartprintf(const char *format, ...)
+void uartvprintf(const char *format, va_list args)
 {
     if (uartHandle == NULL) return;
 
     IArg key = GateMutexPri_enter(GateMutexPri_handle(&uartMutexStruct));
-    va_list args;
-    va_start(args, format);
     vsnprintf(uartsbuf, sizeof(uartsbuf), format, args);
-    va_end(args);
 
     if (UART_write(uartHandle, uartsbuf, strlen(uartsbuf)) == UART_ERROR)
     {
         System_abort("Failed to write formatted buffer to uart\n");
     }
     GateMutexPri_leave(GateMutexPri_handle(&uartMutexStruct), key);
+}
+
+void uartprintf(const char *format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    uartvprintf(format, args);
+    va_end(args);
 }
 
 /**
@@ -304,6 +326,24 @@ char *uartreadline()
     }
     uartlinebuf[index] = '\0';
     return uartlinebuf;
+}
+
+/**
+ * Printf to UART and JTAG
+ *
+ * @note This CANNOT be used in a Hwi or Swi (pin callbacks included), since this function blocks in uart
+ */
+void debugprintf(const char *format, ...)
+{
+    va_list args;
+    va_start(args, format);
+
+    // Print to JTAG debugger
+    vprintf(format, args);
+    // Print to UART console
+    uartvprintf(format, args);
+
+    va_end(args);
 }
 
 void setPin(PIN_Id pin, uint_t value)

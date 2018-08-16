@@ -16,14 +16,30 @@
 extern "C" {
 #endif
 
+
+/*--------------------------------------------------------*
+ *                    Setup Functions                     *
+ *--------------------------------------------------------*/
 void setuppins();
 void setupuart();
 
+
+/*--------------------------------------------------------*
+ *                  Interface Functions                   *
+ *--------------------------------------------------------*/
 void uartwrite(const char *str, size_t size);
 void uartputs(const char *str);
 void uartprintf(const char *format, ...)
     __attribute__ ((format (printf, 1, 2)));
+void uartvprintf(const char *format, va_list args)
+    __attribute__ ((format (printf, 1, 0)));
 char *uartreadline();
+
+/**
+ * Printf to UART and JTAG
+ */
+void debugprintf(const char *format, ...)
+        __attribute__ ((format (printf, 1, 2)));
 
 void setPin(PIN_Id pin, uint_t value);
 void togglePin(PIN_Id pin);
