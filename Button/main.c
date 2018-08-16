@@ -200,7 +200,7 @@ struct ComplianceTest_s
 static void PrepareTxFrame( uint8_t port )
 {
     static uint32_t counter = 1;
-    printf("# PrepareTxFrame\n");
+    debugprintf("# PrepareTxFrame\n");
 
     switch( port )
     {
@@ -255,7 +255,7 @@ static bool SendFrame( void )
     McpsReq_t mcpsReq;
     LoRaMacTxInfo_t txInfo;
 
-    printf("# SendFrame\n");
+    debugprintf("# SendFrame\n");
 
     if( LoRaMacQueryTxPossible( AppDataSize, &txInfo ) != LORAMAC_STATUS_OK )
     {
@@ -298,7 +298,7 @@ static bool SendFrame( void )
  */
 static void OnTxNextPacketTimerEvent( void )
 {
-    printf("# OnTxNextPacketTimerEvent\n");
+    debugprintf("# OnTxNextPacketTimerEvent\n");
     MibRequestConfirm_t mibReq;
     LoRaMacStatus_t status;
 
@@ -355,8 +355,7 @@ static void OnLed2TimerEvent( void )
  */
 static void McpsConfirm( McpsConfirm_t *mcpsConfirm )
 {
-    printf("# McpsConfirm\n");
-//    uartputs("# McpsConfirm\n");
+    debugprintf("# McpsConfirm\n");
     if( mcpsConfirm->Status == LORAMAC_EVENT_INFO_STATUS_OK )
     {
         switch( mcpsConfirm->McpsRequest )
@@ -365,8 +364,7 @@ static void McpsConfirm( McpsConfirm_t *mcpsConfirm )
             {
                 // Check Datarate
                 // Check TxPower
-//                uartputs("# Got McpsConfirm: MCPS_UNCONFIRMED\n");
-                printf("# Got McpsConfirm: MCPS_UNCONFIRMED\n");
+                debugprintf("# Got McpsConfirm: MCPS_UNCONFIRMED\n");
                 break;
             }
             case MCPS_CONFIRMED:
@@ -375,8 +373,7 @@ static void McpsConfirm( McpsConfirm_t *mcpsConfirm )
                 // Check TxPower
                 // Check AckReceived
                 // Check NbTrials
-//                uartputs("# Got McpsConfirm: MCPS_CONFIRMED\n");
-                printf("# Got McpsConfirm: MCPS_CONFIRMED\n");
+                debugprintf("# Got McpsConfirm: MCPS_CONFIRMED\n");
                 break;
             }
             case MCPS_PROPRIETARY:
@@ -401,7 +398,7 @@ static void McpsConfirm( McpsConfirm_t *mcpsConfirm )
  */
 static void McpsIndication( McpsIndication_t *mcpsIndication )
 {
-    printf("# McpsIndication\n");
+    debugprintf("# McpsIndication\n");
     if( mcpsIndication->Status != LORAMAC_EVENT_INFO_STATUS_OK )
     {
         return;
@@ -411,14 +408,12 @@ static void McpsIndication( McpsIndication_t *mcpsIndication )
     {
         case MCPS_UNCONFIRMED:
         {
-//            uartputs("# Got McpsIndication: MCPS_UNCONFIRMED\n");
-            printf("# Got McpsIndication: MCPS_UNCONFIRMED\n");
+            debugprintf("# Got McpsIndication: MCPS_UNCONFIRMED\n");
             break;
         }
         case MCPS_CONFIRMED:
         {
-//            uartputs("# Got McpsIndication: MCPS_CONFIRMED\n");
-            printf("# Got McpsIndication: MCPS_CONFIRMED\n");
+            debugprintf("# Got McpsIndication: MCPS_CONFIRMED\n");
             break;
         }
         case MCPS_PROPRIETARY:
@@ -595,7 +590,7 @@ static void McpsIndication( McpsIndication_t *mcpsIndication )
  */
 static void MlmeConfirm( MlmeConfirm_t *mlmeConfirm )
 {
-    printf("# MlmeConfirm\n");
+    debugprintf("# MlmeConfirm\n");
     switch( mlmeConfirm->MlmeRequest )
     {
         case MLME_JOIN:
@@ -603,7 +598,7 @@ static void MlmeConfirm( MlmeConfirm_t *mlmeConfirm )
             if( mlmeConfirm->Status == LORAMAC_EVENT_INFO_STATUS_OK )
             {
                 // Status is OK, node has joined the network
-                printf("# MlmeConfirm: Join Ok\n");
+                debugprintf("# MlmeConfirm: Join Ok\n");
                 DeviceState = SendOnJoin ? DEVICE_STATE_SEND:DEVICE_STATE_SLEEP;
 
                 setLed(Board_GLED, 0);
@@ -611,7 +606,7 @@ static void MlmeConfirm( MlmeConfirm_t *mlmeConfirm )
             else
             {
                 // Join was not successful. Try to join again
-                printf("# MlmeConfirm: Join Failed\n");
+                debugprintf("# MlmeConfirm: Join Failed\n");
                 DeviceState = DEVICE_STATE_JOIN;
 
                 setLed(Board_RLED, 1);
@@ -621,7 +616,7 @@ static void MlmeConfirm( MlmeConfirm_t *mlmeConfirm )
         }
         case MLME_LINK_CHECK:
         {
-            printf("# MlmeConfirm: Link Check\n");
+            debugprintf("# MlmeConfirm: Link Check\n");
             if( mlmeConfirm->Status == LORAMAC_EVENT_INFO_STATUS_OK )
             {
                 // Check DemodMargin
@@ -653,7 +648,7 @@ void maintask(UArg arg0, UArg arg1)
 
     BoardInitMcu( );
     BoardInitPeriph( );
-    printf("# Board initialized\n");
+    debugprintf("# Board initialized\n");
 
     DeviceState = DEVICE_STATE_INIT;
 
@@ -663,7 +658,7 @@ void maintask(UArg arg0, UArg arg1)
         {
             case DEVICE_STATE_INIT:
             {
-                printf("# DeviceState: DEVICE_STATE_INIT\n");
+                debugprintf("# DeviceState: DEVICE_STATE_INIT\n");
                 LoRaMacPrimitives.MacMcpsConfirm    = McpsConfirm;
                 LoRaMacPrimitives.MacMcpsIndication = McpsIndication;
                 LoRaMacPrimitives.MacMlmeConfirm    = MlmeConfirm;
@@ -693,7 +688,7 @@ void maintask(UArg arg0, UArg arg1)
             }
             case DEVICE_STATE_JOIN:
             {
-                printf("# DeviceState: DEVICE_STATE_JOIN\n");
+                debugprintf("# DeviceState: DEVICE_STATE_JOIN\n");
                 setLed(Board_GLED, 1);
 #if( OVER_THE_AIR_ACTIVATION != 0 )
                 MlmeReq_t mlmeReq;
@@ -750,7 +745,7 @@ void maintask(UArg arg0, UArg arg1)
             }
             case DEVICE_STATE_SEND:
             {
-                printf("# DeviceState: DEVICE_STATE_SEND\n");
+                debugprintf("# DeviceState: DEVICE_STATE_SEND\n");
                 if( NextTx == true )
                 {
                     PrepareTxFrame( AppPort );
@@ -772,7 +767,7 @@ void maintask(UArg arg0, UArg arg1)
             }
             case DEVICE_STATE_CYCLE:
             {
-                printf("# DeviceState: DEVICE_STATE_CYCLE\n");
+                debugprintf("# DeviceState: DEVICE_STATE_CYCLE\n");
                 DeviceState = DEVICE_STATE_SLEEP;
 
                 // Schedule next packet transmission
@@ -784,7 +779,7 @@ void maintask(UArg arg0, UArg arg1)
             }
             case DEVICE_STATE_SLEEP:
             {
-                printf("# DeviceState: DEVICE_STATE_SLEEP\n");
+                debugprintf("# DeviceState: DEVICE_STATE_SLEEP\n");
                 // Wake up through events
                 Event_pend(runtimeEvents, Event_Id_NONE, EVENT_STATECHANGE, BIOS_WAIT_FOREVER);
                 break;
@@ -825,7 +820,7 @@ int main(void)
     setuppins();
 
     /* Open UART */
-//    setupuart();
+    setupuart();
 
     /* Start BIOS */
     BIOS_start();
