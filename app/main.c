@@ -55,14 +55,14 @@ static Event_Handle runtimeEvents;
  * Defines the application data transmission duty cycle. 5s, value in [ms].
  */
 //#define APP_TX_DUTYCYCLE                            5000
-#define APP_TX_DUTYCYCLE                            1000
-
+//#define APP_TX_DUTYCYCLE                            1000
+#define APP_TX_DUTYCYCLE                            (1000*60*10)
 /*!
  * Defines a random delay for application data transmission duty cycle. 1s,
  * value in [ms].
  */
 //#define APP_TX_DUTYCYCLE_RND                        1000
-#define APP_TX_DUTYCYCLE_RND                        1
+#define APP_TX_DUTYCYCLE_RND                        100
 
 /*!
  * Default datarate
@@ -801,7 +801,7 @@ void maintask(UArg arg0, UArg arg1)
                 {
                     LoRaMacMlmeRequest( &mlmeReq );
                 }
-                DeviceState = DEVICE_STATE_SLEEP;
+                DeviceState = DEVICE_STATE_SEND;
 #else
                 // Choose a random device address if not already defined in Commissioning.h
                 if( DevAddr == 0 )
@@ -865,8 +865,8 @@ void maintask(UArg arg0, UArg arg1)
                 DeviceState = DEVICE_STATE_SLEEP;
 
                 // Schedule next packet transmission
-//                TimerSetValue( &TxNextPacketTimer, TxDutyCycleTime );
-//                TimerStart( &TxNextPacketTimer );
+                TimerSetValue( &TxNextPacketTimer, TxDutyCycleTime );
+                TimerStart( &TxNextPacketTimer );
 
                 // wait for button press instead
                 break;
