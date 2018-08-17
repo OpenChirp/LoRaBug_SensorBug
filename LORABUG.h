@@ -32,7 +32,7 @@
 /** ============================================================================
  *  @file       LORABUG.h
  *
- *  @brief      LoRaBug Board Specific header file.
+ *  @brief      LoRaBug Board Core header file.
  *
  *  NB! This is the board file for LoRabug PCB version 3.1
  *
@@ -90,6 +90,10 @@ extern const PIN_Config BoardGpioInitTable[];
 /* Discrete inputs */
 #define Board_BTN                   IOID_22          /* Active low with external pull-up */
 
+/* FTDI Pins */
+#define Board_FTDI_TX               IOID_2
+#define Board_FTDI_RX               IOID_3
+
 /* SX1276 LoRa Radio Pins */
 #define Board_SX_MISO               IOID_14
 #define Board_SX_MOSI               IOID_13
@@ -106,49 +110,16 @@ extern const PIN_Config BoardGpioInitTable[];
 #define Board_SX_DIO5               IOID_16
 
 /* USB UART */
-#define Board_UART_RX               IOID_2          /* FTDI TXD  */
-#define Board_UART_TX               IOID_3          /* FTDI RXD  */
+#define Board_UART_RX               Board_FTDI_TX   /* FTDI TXD  */
+#define Board_UART_TX               Board_FTDI_RX   /* FTDI RXD  */
 #define Board_UART_CTS              PIN_UNASSIGNED  /* CTS  */
 #define Board_UART_RTS              PIN_UNASSIGNED  /* RTS  */
 
-/* SPI Board */
+/* SPI for LoRa Radio */
 #define Board_SPI0_MISO             Board_SX_MISO
 #define Board_SPI0_MOSI             Board_SX_MOSI
 #define Board_SPI0_CLK              Board_SX_SCK
 #define Board_SPI0_CSN              PIN_UNASSIGNED    /* Toggle Manually */
-
-#define Board_SPI1_MISO             PIN_UNASSIGNED
-#define Board_SPI1_MOSI             PIN_UNASSIGNED
-#define Board_SPI1_CLK              PIN_UNASSIGNED
-#define Board_SPI1_CSN              PIN_UNASSIGNED
-
-/* I2C */
-#define Board_I2C0_SCL0             PIN_UNASSIGNED
-#define Board_I2C0_SDA0             PIN_UNASSIGNED
-
-/* SPI */
-#define Board_SPI_FLASH_CS          PIN_UNASSIGNED
-#define Board_FLASH_CS_ON           0
-#define Board_FLASH_CS_OFF          1
-
-#define Board_DIO23_ANALOG          IOID_23
-#define Board_DIO24_ANALOG          IOID_24
-#define Board_DIO25_ANALOG          IOID_25
-#define Board_DIO26_ANALOG          IOID_26
-#define Board_DIO27_ANALOG          IOID_27
-#define Board_DIO28_ANALOG          IOID_28
-#define Board_DIO29_ANALOG          IOID_29
-#define Board_DIO30_ANALOG          IOID_30
-
-/* PWM outputs */
-#define Board_PWMPIN0                       Board_RLED
-#define Board_PWMPIN1                       Board_GLED
-#define Board_PWMPIN2                       PIN_UNASSIGNED
-#define Board_PWMPIN3                       PIN_UNASSIGNED
-#define Board_PWMPIN4                       PIN_UNASSIGNED
-#define Board_PWMPIN5                       PIN_UNASSIGNED
-#define Board_PWMPIN6                       PIN_UNASSIGNED
-#define Board_PWMPIN7                       PIN_UNASSIGNED
 
 /** ============================================================================
  *  Instance identifiers

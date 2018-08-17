@@ -58,6 +58,7 @@
 #include <driverlib/udma.h>
 
 #include <LORABUG.h>
+#include <PERIPHERALS.h>
 
 /*
  *  ========================= IO driver initialization =========================
@@ -490,14 +491,14 @@ const ADCBufCC26XX_AdcChannelLutEntry ADCBufCC26XX_adcChannelLut[] = {
     {PIN_UNASSIGNED, ADC_COMPB_IN_VDDS},
     {PIN_UNASSIGNED, ADC_COMPB_IN_DCOUPL},
     {PIN_UNASSIGNED, ADC_COMPB_IN_VSS},
-    {Board_DIO23_ANALOG, ADC_COMPB_IN_AUXIO7},
-    {Board_DIO24_ANALOG, ADC_COMPB_IN_AUXIO6},
-    {Board_DIO25_ANALOG, ADC_COMPB_IN_AUXIO5},
-    {Board_DIO26_ANALOG, ADC_COMPB_IN_AUXIO4},
-    {Board_DIO27_ANALOG, ADC_COMPB_IN_AUXIO3},
-    {Board_DIO28_ANALOG, ADC_COMPB_IN_AUXIO2},
-    {Board_DIO29_ANALOG, ADC_COMPB_IN_AUXIO1},
-    {Board_DIO30_ANALOG, ADC_COMPB_IN_AUXIO0},
+    {Board_HDR_ADIO0, ADC_COMPB_IN_AUXIO7},
+    {Board_HDR_ADIO1, ADC_COMPB_IN_AUXIO6},
+    {Board_HDR_ADIO2, ADC_COMPB_IN_AUXIO5},
+    {Board_HDR_ADIO3, ADC_COMPB_IN_AUXIO4},
+    {Board_HDR_ADIO4, ADC_COMPB_IN_AUXIO3},
+    {Board_HDR_ADIO5, ADC_COMPB_IN_AUXIO2},
+    {Board_HDR_ADIO6, ADC_COMPB_IN_AUXIO1},
+    {Board_HDR_ADIO7, ADC_COMPB_IN_AUXIO0},
 };
 
 const ADCBufCC26XX_HWAttrs adcBufCC26xxHWAttrs[LORABUG_ADCBufCOUNT] = {
@@ -539,7 +540,7 @@ ADCCC26XX_Object adcCC26xxObjects[LORABUG_ADCCOUNT];
 
 const ADCCC26XX_HWAttrs adcCC26xxHWAttrs[LORABUG_ADCCOUNT] = {
     {
-        .adcDIO = Board_DIO23_ANALOG,
+        .adcDIO = Board_HDR_ADIO0,
         .adcCompBInput = ADC_COMPB_IN_AUXIO7,
         .refSource = ADCCC26XX_FIXED_REFERENCE,
         .samplingDuration = ADCCC26XX_SAMPLING_DURATION_2P7_US,
@@ -547,7 +548,7 @@ const ADCCC26XX_HWAttrs adcCC26xxHWAttrs[LORABUG_ADCCOUNT] = {
         .triggerSource = ADCCC26XX_TRIGGER_MANUAL
     },
     {
-        .adcDIO = Board_DIO24_ANALOG,
+        .adcDIO = Board_HDR_ADIO1,
         .adcCompBInput = ADC_COMPB_IN_AUXIO6,
         .refSource = ADCCC26XX_FIXED_REFERENCE,
         .samplingDuration = ADCCC26XX_SAMPLING_DURATION_2P7_US,
@@ -555,7 +556,7 @@ const ADCCC26XX_HWAttrs adcCC26xxHWAttrs[LORABUG_ADCCOUNT] = {
         .triggerSource = ADCCC26XX_TRIGGER_MANUAL
     },
     {
-        .adcDIO = Board_DIO25_ANALOG,
+        .adcDIO = Board_HDR_ADIO2,
         .adcCompBInput = ADC_COMPB_IN_AUXIO5,
         .refSource = ADCCC26XX_FIXED_REFERENCE,
         .samplingDuration = ADCCC26XX_SAMPLING_DURATION_2P7_US,
@@ -563,7 +564,7 @@ const ADCCC26XX_HWAttrs adcCC26xxHWAttrs[LORABUG_ADCCOUNT] = {
         .triggerSource = ADCCC26XX_TRIGGER_MANUAL
     },
     {
-        .adcDIO = Board_DIO26_ANALOG,
+        .adcDIO = Board_HDR_ADIO3,
         .adcCompBInput = ADC_COMPB_IN_AUXIO4,
         .refSource = ADCCC26XX_FIXED_REFERENCE,
         .samplingDuration = ADCCC26XX_SAMPLING_DURATION_2P7_US,
@@ -571,7 +572,7 @@ const ADCCC26XX_HWAttrs adcCC26xxHWAttrs[LORABUG_ADCCOUNT] = {
         .triggerSource = ADCCC26XX_TRIGGER_MANUAL
     },
     {
-        .adcDIO = Board_DIO27_ANALOG,
+        .adcDIO = Board_HDR_ADIO4,
         .adcCompBInput = ADC_COMPB_IN_AUXIO3,
         .refSource = ADCCC26XX_FIXED_REFERENCE,
         .samplingDuration = ADCCC26XX_SAMPLING_DURATION_2P7_US,
@@ -579,7 +580,7 @@ const ADCCC26XX_HWAttrs adcCC26xxHWAttrs[LORABUG_ADCCOUNT] = {
         .triggerSource = ADCCC26XX_TRIGGER_MANUAL
     },
     {
-        .adcDIO = Board_DIO28_ANALOG,
+        .adcDIO = Board_HDR_ADIO5,
         .adcCompBInput = ADC_COMPB_IN_AUXIO2,
         .refSource = ADCCC26XX_FIXED_REFERENCE,
         .samplingDuration = ADCCC26XX_SAMPLING_DURATION_2P7_US,
@@ -587,7 +588,7 @@ const ADCCC26XX_HWAttrs adcCC26xxHWAttrs[LORABUG_ADCCOUNT] = {
         .triggerSource = ADCCC26XX_TRIGGER_MANUAL
     },
     {
-        .adcDIO = Board_DIO29_ANALOG,
+        .adcDIO = Board_HDR_ADIO6,
         .adcCompBInput = ADC_COMPB_IN_AUXIO1,
         .refSource = ADCCC26XX_FIXED_REFERENCE,
         .samplingDuration = ADCCC26XX_SAMPLING_DURATION_2P7_US,
@@ -595,7 +596,7 @@ const ADCCC26XX_HWAttrs adcCC26xxHWAttrs[LORABUG_ADCCOUNT] = {
         .triggerSource = ADCCC26XX_TRIGGER_MANUAL
     },
     {
-        .adcDIO = Board_DIO30_ANALOG,
+        .adcDIO = Board_HDR_ADIO7,
         .adcCompBInput = ADC_COMPB_IN_AUXIO0,
         .refSource = ADCCC26XX_FIXED_REFERENCE,
         .samplingDuration = ADCCC26XX_SAMPLING_DURATION_10P9_MS,
