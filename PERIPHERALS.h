@@ -22,8 +22,8 @@ extern "C" {
 #define Board_SPI1_CSN              PIN_UNASSIGNED
 
 /* I2C */
-#define Board_I2C0_SCL0             PIN_UNASSIGNED
-#define Board_I2C0_SDA0             PIN_UNASSIGNED
+#define Board_I2C0_SCL0             Board_HDR_HDIO2
+#define Board_I2C0_SDA0             Board_HDR_HDIO0
 
 /* SPI Flash */
 #define Board_SPI_FLASH_CS          PIN_UNASSIGNED
@@ -39,6 +39,30 @@ extern "C" {
 #define Board_PWMPIN5               PIN_UNASSIGNED
 #define Board_PWMPIN6               PIN_UNASSIGNED
 #define Board_PWMPIN7               PIN_UNASSIGNED
+
+
+/* Header pins */
+
+#define DOMAIN1_EN      Board_HDR_HDIO1 // Active High - Also CS# on Flash
+#define DOMAIN2_ENN     Board_HDR_ADIO7 // Active Low
+#define LIGHT_OUT       Board_HDR_ADIO0 // Analog Input
+#define MIC_OUT         Board_HDR_ADIO2 // Analog Input
+#define BMX_INT1        Board_HDR_ADIO4 // Digital Input
+#define PIR_OUT         Board_HDR_ADIO6 // Digital Input
+
+#define FLASH_MOSI      Board_HDR_ADIO1
+#define FLASH_MISO      Board_HDR_ADIO5
+#define FLASH_CLK       Board_HDR_ADIO3
+#define FLASH_CSN       DOMAIN1_EN
+
+#define ADC_INDEX_LUX   LORABUG_ADC0
+#define ADC_INDEX_MIC   LORABUG_ADC2
+
+#define MIC_SAMPLES             5000                            // MAXVAL < uint16_t
+#define LUX_SAMPLES             100                             // MAXVAL < uint16_t
+#define LUX_AVG_MIN_VALUE       8.0                             // The average minimum value the sensor reports in complete darkness
+#define LUX_AVG_MAX_VALUE       1200.0                          // Average value when the sensor is exposed to very bright light
+#define LUX_SCALE_MULTIPLIER    (0xffff/LUX_AVG_MAX_VALUE)      // Maximizes the read value to the uint16 scale
 
 
 #ifdef __cplusplus

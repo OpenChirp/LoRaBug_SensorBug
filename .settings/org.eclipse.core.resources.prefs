@@ -1,6 +1,8 @@
 eclipse.preferences.version=1
 encoding//Debug/app/subdir_rules.mk=UTF-8
 encoding//Debug/app/subdir_vars.mk=UTF-8
+encoding//Debug/drivers/subdir_rules.mk=UTF-8
+encoding//Debug/drivers/subdir_vars.mk=UTF-8
 encoding//Debug/loramac/src/boards/LoRaBug/cc26xx/subdir_rules.mk=UTF-8
 encoding//Debug/loramac/src/boards/LoRaBug/cc26xx/subdir_vars.mk=UTF-8
 encoding//Debug/loramac/src/boards/LoRaBug/subdir_rules.mk=UTF-8
@@ -22,6 +24,8 @@ encoding//Debug/subdir_rules.mk=UTF-8
 encoding//Debug/subdir_vars.mk=UTF-8
 encoding//Release/app/subdir_rules.mk=UTF-8
 encoding//Release/app/subdir_vars.mk=UTF-8
+encoding//Release/drivers/subdir_rules.mk=UTF-8
+encoding//Release/drivers/subdir_vars.mk=UTF-8
 encoding//Release/loramac/src/apps/BootLoader/LoRaMote/subdir_rules.mk=UTF-8
 encoding//Release/loramac/src/apps/BootLoader/LoRaMote/subdir_vars.mk=UTF-8
 encoding//Release/loramac/src/apps/BootLoader/SensorNode/subdir_rules.mk=UTF-8
