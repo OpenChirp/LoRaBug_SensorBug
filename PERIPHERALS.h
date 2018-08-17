@@ -65,15 +65,18 @@ extern "C" {
 
 /* Macros to define power domain signal levels,
  * since they have different polarity. */
-#define DOMAIN1_OFF     PIN_GPIO_LOW
-#define DOMAIN1_ON      PIN_GPIO_HIGH
-#define DOMAIN2_OFF     PIN_GPIO_HIGH
-#define DOMAIN2_ON      PIN_GPIO_LOW
+#define DOMAIN1_OFF     0
+#define DOMAIN1_ON      1
+#define DOMAIN2_OFF     1
+#define DOMAIN2_ON      0
 
 /* Add items to pin init table in LORABUG.c */
 #define PERIPHERALS_PIN_INIT \
-        DOMAIN1_EN     | PIN_GPIO_OUTPUT_EN | DOMAIN1_OFF | PIN_PUSHPULL | PIN_DRVSTR_MAX, \
-        DOMAIN2_ENN    | PIN_GPIO_OUTPUT_EN | DOMAIN2_OFF | PIN_PUSHPULL,
+        DOMAIN1_EN     | PIN_GPIO_OUTPUT_EN | PIN_GPIO_LOW  | PIN_PUSHPULL | PIN_DRVSTR_MAX, \
+        DOMAIN2_ENN    | PIN_GPIO_OUTPUT_EN | PIN_GPIO_HIGH | PIN_PUSHPULL,
+
+/* Add items to header pin open table in io.c */
+#define PERIPHERALS_HDR_IO_PINS PERIPHERALS_PIN_INIT
 
 #ifdef __cplusplus
 }

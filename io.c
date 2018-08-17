@@ -9,6 +9,7 @@
 #include <stdarg.h>
 
 #include "LORABUG.h"
+#include "PERIPHERALS.h"
 #include "board.h"
 
 /* XDCtools Header files */
@@ -80,6 +81,7 @@ static PIN_Config hdrPinTable[] = {
 //     Board_HDR_ADIO5 | PIN_GPIO_OUTPUT_EN | PIN_GPIO_LOW | PIN_PUSHPULL,
 //     Board_HDR_ADIO6 | PIN_GPIO_OUTPUT_EN | PIN_GPIO_LOW | PIN_PUSHPULL,
 //     Board_HDR_ADIO7 | PIN_GPIO_OUTPUT_EN | PIN_GPIO_LOW | PIN_PUSHPULL,
+        PERIPHERALS_HDR_IO_PINS
         PIN_TERMINATE
 };
 
