@@ -14,6 +14,8 @@
 #include <ti/drivers/PIN.h>
 #include <ti/drivers/SPI.h>
 #include <ti/drivers/UART.h>
+#include <ti/drivers/ADC.h>
+#include <ti/drivers/I2C.h>
 // #include <ti/drivers/Watchdog.h>
 
 /* Board Header files */
@@ -846,9 +848,10 @@ int main(void)
 
     /* Call board init functions */
     Board_initGeneral();
-    // Board_initI2C();
+    Board_initI2C();
     Board_initSPI();
     Board_initUART();
+    Board_initADC();
     // Board_initWatchdog();
 
     /* Construct heartBeat Task  thread */
