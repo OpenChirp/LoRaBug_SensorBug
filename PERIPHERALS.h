@@ -40,7 +40,6 @@ extern "C" {
 #define Board_PWMPIN6               PIN_UNASSIGNED
 #define Board_PWMPIN7               PIN_UNASSIGNED
 
-
 /* Header pins */
 
 #define DOMAIN1_EN      Board_HDR_HDIO1 // Active High - Also CS# on Flash
@@ -64,6 +63,17 @@ extern "C" {
 #define LUX_AVG_MAX_VALUE       1200.0                          // Average value when the sensor is exposed to very bright light
 #define LUX_SCALE_MULTIPLIER    (0xffff/LUX_AVG_MAX_VALUE)      // Maximizes the read value to the uint16 scale
 
+/* Macros to define power domain signal levels,
+ * since they have different polarity. */
+#define DOMAIN1_OFF     PIN_GPIO_LOW
+#define DOMAIN1_ON      PIN_GPIO_HIGH
+#define DOMAIN2_OFF     PIN_GPIO_HIGH
+#define DOMAIN2_ON      PIN_GPIO_LOW
+
+/* Add items to pin init table in LORABUG.c */
+#define PERIPHERALS_PIN_INIT \
+        DOMAIN1_EN     | PIN_GPIO_OUTPUT_EN | DOMAIN1_OFF | PIN_PUSHPULL | PIN_DRVSTR_MAX, \
+        DOMAIN2_ENN    | PIN_GPIO_OUTPUT_EN | DOMAIN2_OFF | PIN_PUSHPULL,
 
 #ifdef __cplusplus
 }

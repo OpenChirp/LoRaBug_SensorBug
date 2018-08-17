@@ -93,6 +93,7 @@ const PIN_Config BoardGpioInitTable[] = {
     Board_SX_DIO5     | PIN_INPUT_EN        | PIN_NOPULL,
     Board_SX_RF_CTRL1 | PIN_GPIO_OUTPUT_EN  | PIN_GPIO_LOW,
     Board_SX_RF_CTRL2 | PIN_GPIO_OUTPUT_EN  | PIN_GPIO_LOW,
+    PERIPHERALS_PIN_INIT
     PIN_TERMINATE
 };
 
