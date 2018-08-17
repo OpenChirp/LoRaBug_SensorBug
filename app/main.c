@@ -20,9 +20,11 @@
 
 /* Board Header files */
 #include "LORABUG.h"
+#include "PERIPHERALS.h"
 
 #include <string.h> // strlen in uartputs and LoRaWan code
 #include <math.h>
+#include <sensors.h>
 #include "io.h"
 
 /* LoRa Radio Header files */
@@ -205,20 +207,102 @@ struct ComplianceTest_s
 static void PrepareTxFrame( uint8_t port )
 {
     static uint32_t counter = 1;
+    uint16_t batteryVoltage = 0;
+    uint8_t batteryLevel = 0;
+    //uint16_t micLevel = 0;
+    uint16_t luxLevel = 0;
+    uint8_t pirLevel = 0;
+    uint8_t bmxInts = 0;
+    struct bme680_field_data bmeData;
     debugprintf("# PrepareTxFrame\n");
 
     switch( port )
     {
     case 2:
+    {
+        // Layout Of Payload: [(counter-uint32), (batteryvoltage-uint16), ...]
+
+        batteryVoltage = BoardGetBatteryVoltage();
+        batteryLevel = BoardGetBatteryLevel();
+
+        // Enable Sensors Power
+        setPin(DOMAIN1_EN, DOMAIN1_ON);
+
+        //micLevel = getMIC();
+        luxLevel = getLUX();
+        pirLevel = getPIR();
+        bmeData = getBME();
+        bmxInts = getBMXInts();
+
+        // Disable Sensors Power
+        setPin(DOMAIN1_EN, DOMAIN1_OFF);
+
+        // Clean Buffer
+        memset(AppData, '\0', sizeof(AppData));
+        AppDataSize = 0;
+
+        // Copy Counter
+        memcpy(AppData, &counter, sizeof(counter));
+        AppDataSize += sizeof(counter);
+        counter++;
+        debugprintf("Counter: %d\r\n", counter);
+
+        // Copy Battery Voltage
+        memcpy(AppData + AppDataSize, &batteryVoltage, sizeof(batteryVoltage));
+        AppDataSize += sizeof(batteryVoltage);
+        debugprintf("Battery Voltage: %d mV\r\n", batteryVoltage);
+
+        // Copy Battery Level
+        //memcpy(AppData + AppDataSize, &batteryLevel, sizeof(batteryLevel));
+        //AppDataSize += sizeof(batteryLevel);
+        debugprintf("Battery Level: %d/254\r\n", batteryLevel);
+
+        // Copy Mic Value
+        //memcpy(AppData + AppDataSize, &micLevel, sizeof(micLevel));
+        //AppDataSize += sizeof(micLevel);
+        //debugprintf("Mic Level: %d\r\n", micLevel);
+
+        // Copy Lux Value
+        memcpy(AppData + AppDataSize, &luxLevel, sizeof(luxLevel));
+        AppDataSize += sizeof(luxLevel);
+        debugprintf("Lux Level: %d\r\n", luxLevel);
+
+        // Copy PIR Value
+        memcpy(AppData + AppDataSize, &pirLevel, sizeof(pirLevel));
+        AppDataSize += sizeof(pirLevel);
+        debugprintf("PIR Level: %d\r\n", pirLevel);
+
+        // Copy Sensors Values Temperature, Humidity, Pressure, and Gas Resistance
+        memcpy(AppData + AppDataSize, &bmeData.temperature,
+               sizeof(bmeData.temperature));
+        AppDataSize += sizeof(bmeData.temperature);
+        debugprintf("Temperature: %f degC\r\n", bmeData.temperature);
+
+        memcpy(AppData + AppDataSize, &bmeData.humidity,
+               sizeof(bmeData.humidity));
+        AppDataSize += sizeof(bmeData.humidity);
+        debugprintf("Humidity: %f %%rH\r\n", bmeData.humidity);
+
+        memcpy(AppData + AppDataSize, &bmeData.pressure,
+               sizeof(bmeData.pressure));
+        AppDataSize += sizeof(bmeData.pressure);
+        debugprintf("Pressure: %f hPa\r\n", bmeData.pressure);
+
+        memcpy(AppData + AppDataSize, &bmeData.gas_resistance,
+               sizeof(bmeData.gas_resistance));
+        AppDataSize += sizeof(bmeData.gas_resistance);
+        debugprintf("GasResistance: %f ohms\r\n", bmeData.gas_resistance);
+
+        // TODO
+        /* Avoid using measurements from an unstable heating setup */
+        if (!(bmeData.status & BME680_GASM_VALID_MSK))
         {
-            // Layout Of Payload: [(counter-uint32), (batteryvoltage-uint32)]
-            uint32_t batvolt = BoardGetBatteryVoltage();
-            memset(AppData, '\0', sizeof(AppData));
-            memcpy(AppData, &counter, sizeof(counter));
-            memcpy(AppData+sizeof(counter), &batvolt, sizeof(batvolt));
-            AppDataSize = sizeof(counter)+sizeof(batvolt);
-            counter++;
+            debugprintf("Gas Resistance is not Valid!\r\n");
         }
+
+        debugprintf("BMX Interrupts: %d/255\r\n", bmxInts);
+        debugprintf("Total Packet Size: %d bytes\r\n", AppDataSize);
+    }
         break;
     case 224:
         if( ComplianceTest.LinkCheck == true )
