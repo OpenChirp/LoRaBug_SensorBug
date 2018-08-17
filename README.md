@@ -1,11 +1,23 @@
 # Example Summary
-This example cycles through illuminating the red LED, the green LED,
-and then sleeping at a rate determined by the `arg0` parameter for the
-constructed heart beat Task.
-It is intended to be a starting point for new development where
-a minimal footprint is needed.
+This example turns a LoRaBug into a LoRaWAN remote button trigger.
+Upon powering up, the LoRaBug will attempt to Join the LoRaWAN network
+(unless APB provisioned). Immediately after Joining, it will go to sleep until
+the button is pressed (typically less than 300nA).
+Upon a button press, the LoRaBug will send an unconfirmed LoRaWAN packet
+containing a counter value and it's current battery voltage.
+The payload is the counter followed by the battery voltage as plain uint32s
+in little endian.
 
-See [blinky_sleep.c](blinky_sleep.c) for more information.
+See [app/main.c](app/main.c) for more information.
+
+# ByteTranslator Config
+
+| Parameter Name       | Parameter Value  |
+| -------------------- | ---------------- |
+| Incoming Field Names | counter, battery |
+| Incoming Field Types | uint32, uint32   |
+| Endianness           | little           |
+
 
 # Cloning and Submodules
 
@@ -18,7 +30,8 @@ git submodule update --init --recursive
 
 * `Board_RLED`
 * `Board_GLED`
-* `Radio.Sleep()`
+* `Board_BTN`
+* LoRaWAN
 
 # Application Design Details
 
