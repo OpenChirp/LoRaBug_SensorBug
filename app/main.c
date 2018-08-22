@@ -208,12 +208,13 @@ static void PrepareTxFrame( uint8_t port )
 {
     static uint32_t counter = 1;
     uint16_t batteryVoltage = 0;
-    uint8_t batteryLevel = 0;
+//    uint8_t batteryLevel = 0;
     //uint16_t micLevel = 0;
     uint16_t luxLevel = 0;
     uint8_t pirLevel = 0;
     uint8_t bmxInts = 0;
     struct bme680_field_data bmeData;
+
     debugprintf("# PrepareTxFrame\n");
 
     switch( port )
@@ -221,9 +222,11 @@ static void PrepareTxFrame( uint8_t port )
     case 2:
     {
         // Layout Of Payload: [(counter-uint32), (batteryvoltage-uint16), ...]
+        // Fields: counter, battery, lux, pir, accel, temp, humidity, pressure, gas
+        // Types:  uint32, uint16, uint16, uint8, uint8, float32, float32, float32, float32
 
         batteryVoltage = BoardGetBatteryVoltage();
-        batteryLevel = BoardGetBatteryLevel();
+//        batteryLevel = BoardGetBatteryLevel();
 
         // Enable Sensors Power
         setPin(DOMAIN1_EN, DOMAIN1_ON);
@@ -255,7 +258,7 @@ static void PrepareTxFrame( uint8_t port )
         // Copy Battery Level
         //memcpy(AppData + AppDataSize, &batteryLevel, sizeof(batteryLevel));
         //AppDataSize += sizeof(batteryLevel);
-        debugprintf("Battery Level: %d/254\r\n", batteryLevel);
+        //debugprintf("Battery Level: %d/254\r\n", batteryLevel);
 
         // Copy Mic Value
         //memcpy(AppData + AppDataSize, &micLevel, sizeof(micLevel));
@@ -272,35 +275,34 @@ static void PrepareTxFrame( uint8_t port )
         AppDataSize += sizeof(pirLevel);
         debugprintf("PIR Level: %d\r\n", pirLevel);
 
-        // Copy Sensors Values Temperature, Humidity, Pressure, and Gas Resistance
-        memcpy(AppData + AppDataSize, &bmeData.temperature,
-               sizeof(bmeData.temperature));
+        // Copy Accelerometer Value
+        memcpy(AppData + AppDataSize, &bmxInts, sizeof(bmxInts));
+        AppDataSize += sizeof(bmxInts);
+        debugprintf("Acc Interrupts: %d/255\r\n", bmxInts);
+
+        // Copy Sensors Values, Temperature Humidity, Pressure and Gas Resistance
+        memcpy(AppData + AppDataSize, &bmeData.temperature, sizeof(bmeData.temperature));
         AppDataSize += sizeof(bmeData.temperature);
         debugprintf("Temperature: %f degC\r\n", bmeData.temperature);
 
-        memcpy(AppData + AppDataSize, &bmeData.humidity,
-               sizeof(bmeData.humidity));
+        memcpy(AppData + AppDataSize, &bmeData.humidity, sizeof(bmeData.humidity));
         AppDataSize += sizeof(bmeData.humidity);
         debugprintf("Humidity: %f %%rH\r\n", bmeData.humidity);
 
-        memcpy(AppData + AppDataSize, &bmeData.pressure,
-               sizeof(bmeData.pressure));
+        memcpy(AppData + AppDataSize, &bmeData.pressure, sizeof(bmeData.pressure));
         AppDataSize += sizeof(bmeData.pressure);
         debugprintf("Pressure: %f hPa\r\n", bmeData.pressure);
 
-        memcpy(AppData + AppDataSize, &bmeData.gas_resistance,
-               sizeof(bmeData.gas_resistance));
+        memcpy(AppData + AppDataSize, &bmeData.gas_resistance, sizeof(bmeData.gas_resistance));
         AppDataSize += sizeof(bmeData.gas_resistance);
         debugprintf("GasResistance: %f ohms\r\n", bmeData.gas_resistance);
 
         // TODO
         /* Avoid using measurements from an unstable heating setup */
-        if (!(bmeData.status & BME680_GASM_VALID_MSK))
-        {
+        if(!(bmeData.status & BME680_GASM_VALID_MSK)){
             debugprintf("Gas Resistance is not Valid!\r\n");
         }
 
-        debugprintf("BMX Interrupts: %d/255\r\n", bmxInts);
         debugprintf("Total Packet Size: %d bytes\r\n", AppDataSize);
     }
         break;
@@ -742,6 +744,8 @@ void maintask(UArg arg0, UArg arg1)
 
     BoardInitMcu( );
     BoardInitPeriph( );
+    BoardInitSensors( );
+
     debugprintf("# Board initialized\n");
 
     DeviceState = DEVICE_STATE_INIT;
@@ -867,8 +871,6 @@ void maintask(UArg arg0, UArg arg1)
                 // Schedule next packet transmission
                 TimerSetValue( &TxNextPacketTimer, TxDutyCycleTime );
                 TimerStart( &TxNextPacketTimer );
-
-                // wait for button press instead
                 break;
             }
             case DEVICE_STATE_SLEEP:

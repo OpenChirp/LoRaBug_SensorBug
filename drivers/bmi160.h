@@ -188,7 +188,7 @@ int8_t bmi160_get_power_mode(struct bmi160_pmu_status *pmu_status, const struct 
  * @retval zero -> Success  / -ve value -> Error
  */
 int8_t bmi160_get_sensor_data(uint8_t select_sensor, struct bmi160_sensor_data *accel,
-				struct bmi160_sensor_data *gyro, const struct bmi160_dev *dev);
+                struct bmi160_sensor_data *gyro, const struct bmi160_dev *dev);
 
 /*!
  * @brief This API configures the necessary interrupt based on
@@ -206,8 +206,8 @@ int8_t bmi160_set_int_config(struct bmi160_int_settg *int_config, struct bmi160_
 /*!
  * @brief This API enables the step counter feature.
  *
- * @param[in] step_cnt_enable	: value to enable or disable
- * @param[in] dev		: Structure instance of bmi160_dev.
+ * @param[in] step_cnt_enable   : value to enable or disable
+ * @param[in] dev       : Structure instance of bmi160_dev.
  * @note : Refer user guide for detailed info.
  *
  * @return Result of API execution status
@@ -218,7 +218,7 @@ int8_t bmi160_set_step_counter(uint8_t step_cnt_enable, const struct bmi160_dev 
 /*!
  * @brief This API reads the step counter value.
  *
- * @param[in] step_val	  : Pointer to store the step counter value.
+ * @param[in] step_val    : Pointer to store the step counter value.
  * @param[in] dev         : Structure instance of bmi160_dev.
  * @note : Refer user guide for detailed info.
  *
@@ -231,9 +231,9 @@ int8_t bmi160_read_step_counter(uint16_t *step_val, const struct bmi160_dev *dev
  * @brief This API reads the mention no of byte of data from the given
  * register address of auxiliary sensor.
  *
- * @param[in] reg_addr	  : Address of register to read.
- * @param[in] aux_data	  : Pointer to store the read data.
- * @param[in] len	  : No of bytes to read.
+ * @param[in] reg_addr    : Address of register to read.
+ * @param[in] aux_data    : Pointer to store the read data.
+ * @param[in] len     : No of bytes to read.
  * @param[in] dev         : Structure instance of bmi160_dev.
  * @note : Refer user guide for detailed info.
  *
@@ -246,9 +246,9 @@ int8_t bmi160_aux_read(uint8_t reg_addr, uint8_t *aux_data, uint16_t len, const 
  * @brief This API writes the mention no of byte of data to the given
  * register address of auxiliary sensor.
  *
- * @param[in] reg_addr	  : Address of register to write.
- * @param[in] aux_data	  : Pointer to write data.
- * @param[in] len	  : No of bytes to write.
+ * @param[in] reg_addr    : Address of register to write.
+ * @param[in] aux_data    : Pointer to write data.
+ * @param[in] len     : No of bytes to write.
  * @param[in] dev         : Structure instance of bmi160_dev.
  * @note : Refer user guide for detailed info.
  *
@@ -274,11 +274,11 @@ int8_t bmi160_aux_init(const struct bmi160_dev *dev);
  * Thus enabling the auto update of 8 bytes of data from auxiliary sensor
  * to BMI160 register address 0x04 to 0x0B
  *
- * @param[in] data_addr	   : Starting address of aux. sensor's data register
+ * @param[in] data_addr    : Starting address of aux. sensor's data register
  *                           (BMI160 registers 0x04 to 0x0B will be updated
  *                           with 8 bytes of data from auxiliary sensor
  *                           starting from this register address.)
- * @param[in] dev	   : Structure instance of bmi160_dev.
+ * @param[in] dev      : Structure instance of bmi160_dev.
  *
  * @note : Set the value of auxiliary polling rate by setting
  *         dev->aux_cfg.aux_odr to the required value from the table
@@ -320,10 +320,10 @@ int8_t bmi160_config_aux_mode(const struct bmi160_dev *dev);
  * @brief This API is used to read the raw uncompensated auxiliary sensor
  * data of 8 bytes from BMI160 register address 0x04 to 0x0B
  *
- * @param[in] aux_data	     : Pointer to user array of length 8 bytes
+ * @param[in] aux_data       : Pointer to user array of length 8 bytes
  *                             Ensure that the aux_data array is of
  *                             length 8 bytes
- * @param[in] dev	     : Structure instance of bmi160_dev
+ * @param[in] dev        : Structure instance of bmi160_dev
  *
  * @return Result of API execution status
  * @retval zero -> Success  / -ve value -> Error
@@ -342,7 +342,7 @@ int8_t bmi160_read_aux_data_auto_mode(uint8_t *aux_data, const struct bmi160_dev
  *----------------------------------|--------------------------------
  *   BMI160_ACCEL_ONLY              | Accel self test enabled
  *   BMI160_GYRO_ONLY               | Gyro self test enabled
- *   BMI160_BOTH_ACCEL_AND_GYRO	    | NOT TO BE USED
+ *   BMI160_BOTH_ACCEL_AND_GYRO     | NOT TO BE USED
  *
  * @note The return value of this API gives us the result of self test.
  *
@@ -407,7 +407,7 @@ int8_t bmi160_set_fifo_flush(const struct bmi160_dev *dev);
  *      BMI160_FIFO_TAG_INT1    |   0x08
  *      BMI160_FIFO_HEADER      |   0x10
  *      BMI160_FIFO_AUX         |   0x20
- *      BMI160_FIFO_ACCEL	|   0x40
+ *      BMI160_FIFO_ACCEL   |   0x40
  *      BMI160_FIFO_GYRO        |   0x80
  *
  *  @param[in] enable : Parameter used to enable or disable the above
@@ -608,7 +608,7 @@ int8_t bmi160_extract_aux(struct bmi160_aux_data *aux_data, uint8_t *aux_len, st
  *  @retval Any non zero value -> Fail
  */
 int8_t bmi160_start_foc(const struct bmi160_foc_conf *foc_conf, struct bmi160_offsets *offset,
-				struct bmi160_dev const *dev);
+                struct bmi160_dev const *dev);
 
 /*!
  *  @brief This API reads and stores the offset values of accel and gyro
@@ -647,7 +647,7 @@ int8_t bmi160_get_offsets(struct bmi160_offsets *offset, const struct bmi160_dev
  *  @retval Any non zero value -> Fail
  */
 int8_t bmi160_set_offsets(const struct bmi160_foc_conf *foc_conf, const struct bmi160_offsets *offset,
-				struct bmi160_dev const *dev);
+                struct bmi160_dev const *dev);
 
 /*!
  *  @brief This API writes the image registers values to NVM which is
@@ -664,18 +664,20 @@ int8_t bmi160_update_nvm(struct bmi160_dev const *dev);
 /*!
  *  @brief This API gets the interrupt status from the sensor.
  *
- *  @param[in] int_status_sel		: Enum variable to select either individual or all the
+ *  @param[in] int_status_sel       : Enum variable to select either individual or all the
  *  interrupt status bits.
- *	@param[in] int_status			: pointer variable to get the interrupt status
- *	from the sensor.
- *	param[in] dev					: Structure instance of bmi160_dev.
+ *  @param[in] int_status           : pointer variable to get the interrupt status
+ *  from the sensor.
+ *  param[in] dev                   : Structure instance of bmi160_dev.
  *
  *  @return Result of API execution status
  *  @retval 0 -> Success
  *  @retval Any non zero value -> Fail
  */
 int8_t bmi160_get_int_status(enum bmi160_int_status_sel int_status_sel,
-				union bmi160_int_status *int_status, struct bmi160_dev const *dev);
+                union bmi160_int_status *int_status, struct bmi160_dev const *dev);
+
+extern int8_t set_accel_any_motion_int(struct bmi160_int_settg *int_config, struct bmi160_dev *dev);
 
 /*************************** C++ guard macro *****************************/
 #ifdef __cplusplus
