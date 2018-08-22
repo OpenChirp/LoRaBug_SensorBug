@@ -29,7 +29,8 @@
 
 #include <driverlib/sys_ctrl.h> // SysCtrlSystemReset()
 
-#define UART_PRINTF_BUFFER_SIZE 128 // SHould be at least 5+17 for uarthexdump
+/* Settings */
+#define UART_PRINTF_BUFFER_SIZE 128 // Should be a minimum of 5+17 for uarthexdump
 #define UART_RECV_LINE_LENGTH 768
 #define HEXDUMP_STR_PREFIX "# " // Must be defined, but can be ""
 
@@ -63,13 +64,13 @@ static char uartlinebuf[UART_RECV_LINE_LENGTH + 1]; // +1 for '\0'
  * Application LED pin configuration table:
  *   - All LEDs board LEDs are off.
  */
-static PIN_Config ledPinTable[] = {
+static const PIN_Config ledPinTable[] = {
         Board_GLED | PIN_GPIO_OUTPUT_EN | PIN_GPIO_LOW | PIN_PUSHPULL | PIN_DRVSTR_MAX,
         Board_RLED | PIN_GPIO_OUTPUT_EN | PIN_GPIO_LOW | PIN_PUSHPULL | PIN_DRVSTR_MAX,
         PIN_TERMINATE
 };
 
-static PIN_Config hdrPinTable[] = {
+static const PIN_Config hdrPinTable[] = {
 //     Board_HDR_HDIO0 | PIN_GPIO_OUTPUT_EN | PIN_GPIO_LOW | PIN_PUSHPULL | PIN_DRVSTR_MAX,
 //     Board_HDR_HDIO1 | PIN_GPIO_OUTPUT_EN | PIN_GPIO_LOW | PIN_PUSHPULL | PIN_DRVSTR_MAX,
 //     Board_HDR_HDIO2 | PIN_GPIO_OUTPUT_EN | PIN_GPIO_LOW | PIN_PUSHPULL | PIN_DRVSTR_MAX,
@@ -85,12 +86,13 @@ static PIN_Config hdrPinTable[] = {
         PIN_TERMINATE
 };
 
-static PIN_Config btnPinTable[] = {
+static const PIN_Config btnPinTable[] = {
         Board_BTN | PIN_INPUT_EN | PIN_NOPULL | PIN_HYSTERESIS | PIN_IRQ_NEGEDGE,
         PIN_TERMINATE
 };
 
-static PIN_Config uartSensePinTable[] = {
+
+static const PIN_Config uartSensePinTable[] = {
         Board_UART_RX | PIN_INPUT_EN | PIN_NOPULL | PIN_HYSTERESIS | PIN_IRQ_POSEDGE,
         PIN_TERMINATE
 };
@@ -184,18 +186,14 @@ void setuppins()
     {
         System_abort("Failed to register btn int callback\n");
     }
-
-//    if (PIN_setConfig(btnPinHandle, PIN_BM_IRQ, Board_BTN | PIN_IRQ_NEGEDGE) != PIN_SUCCESS )
-//    {
-//        System_abort("Failed to config btn to negedge\n");
-//    }
 }
 
 /**
  * @note This routine should not race with the uartsetup function because the interrupt
  *       is only registered after we decide not to call uartopen.
  */
-static void uartopen() {
+static void uartopen()
+{
     if (uartHandle == NULL)
     {
         PIN_registerIntCb(uartSensePinHandle, NULL);
