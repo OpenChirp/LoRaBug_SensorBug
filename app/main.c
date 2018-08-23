@@ -748,6 +748,9 @@ void maintask(UArg arg0, UArg arg1)
 
     debugprintf("# Board initialized\n");
 
+    // Space after 0x, so that it is easy to copy-paste
+    debugprintf("# DevEUI: 0x %2.2X%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X\n", DevEui[0], DevEui[1], DevEui[2], DevEui[3], DevEui[4], DevEui[5], DevEui[6], DevEui[7]);
+    debugprintf("# AppKey: 0x %2.2X%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X\n", AppKey[0], AppKey[1], AppKey[2], AppKey[3], AppKey[4], AppKey[5], AppKey[6], AppKey[7], AppKey[8], AppKey[9], AppKey[10], AppKey[11], AppKey[12], AppKey[13], AppKey[14], AppKey[15]);
     DeviceState = DEVICE_STATE_INIT;
 
     while( 1 )
