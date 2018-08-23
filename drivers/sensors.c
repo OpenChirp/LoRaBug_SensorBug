@@ -25,10 +25,11 @@ volatile static uint8_t bmxCount = 0;
 static PIN_Handle PinHandle;
 static PIN_State PinState;
 
-PIN_Config pinTable[] = {
-PIR_OUT | PIN_INPUT_EN | PIN_PULLDOWN | PIN_IRQ_POSEDGE,
-BMX_INT1 | PIN_INPUT_EN | PIN_PULLDOWN | PIN_IRQ_POSEDGE,
-PIN_TERMINATE };
+static const PIN_Config pinTable[] = {
+    PIR_OUT  | PIN_INPUT_EN | PIN_PULLDOWN | PIN_IRQ_POSEDGE, // PIR seems to push up
+    BMX_INT1 | PIN_INPUT_EN | PIN_NOPULL | PIN_IRQ_NEGEDGE, // BMX is configured to push-pull
+    PIN_TERMINATE
+};
 
 static void SensorIntHandler(PIN_Handle handle, PIN_Id pinId) {
 
