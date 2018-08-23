@@ -29,7 +29,7 @@ PIR_OUT | PIN_INPUT_EN | PIN_PULLDOWN | PIN_IRQ_POSEDGE,
 BMX_INT1 | PIN_INPUT_EN | PIN_PULLDOWN | PIN_IRQ_POSEDGE,
 PIN_TERMINATE };
 
-static void PIRCallback(PIN_Handle handle, PIN_Id pinId) {
+static void SensorIntHandler(PIN_Handle handle, PIN_Id pinId) {
 
     if (pinId == PIR_OUT && pirCount < 0xFF)
         pirCount++;
@@ -38,14 +38,14 @@ static void PIRCallback(PIN_Handle handle, PIN_Id pinId) {
         bmxCount++;
 }
 
-void BoardInitSensors(void){
+void BoardInitSensors(void) {
 
     // Adds PIR Interrupt Callback
     PinHandle = PIN_open(&PinState, pinTable);
     if (!PinHandle) {
         System_abort("Error Opening Pins\n");
     }
-    if (PIN_registerIntCb(PinHandle, PIRCallback) != PIN_SUCCESS) {
+    if (PIN_registerIntCb(PinHandle, SensorIntHandler) != PIN_SUCCESS) {
         System_abort("Failed to register pir int callback\n");
     }
 
@@ -54,9 +54,9 @@ void BoardInitSensors(void){
 
 }
 
-uint16_t getMIC(void){
+uint16_t getMIC(void) {
 
-    ADC_Params   params;
+    ADC_Params params;
     ADC_Handle adc;
     int_fast16_t res;
     uint16_t adcValue, minV = 0xFFFF, maxV = 0, count = 0;
@@ -94,7 +94,7 @@ uint16_t getMIC(void){
 }
 
 uint16_t getLUX(void){
-    ADC_Params   params;
+    ADC_Params params;
     ADC_Handle adc;
 
     int_fast16_t res;
@@ -137,13 +137,13 @@ uint16_t getLUX(void){
 
 }
 
-uint8_t getPIR(void){
+uint8_t getPIR(void) {
     uint8_t tmp = pirCount;
     pirCount = 0;
     return tmp;
 }
 
-uint8_t getBMXInts(void){
+uint8_t getBMXInts(void) {
     uint8_t tmp = bmxCount;
     bmxCount = 0;
     return tmp;
