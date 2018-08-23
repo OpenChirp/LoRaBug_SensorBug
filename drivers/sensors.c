@@ -8,6 +8,7 @@
 #include <xdc/std.h>
 #include <xdc/runtime/System.h>
 #include <ti/drivers/ADC.h>
+#include <ti/sysbios/hal/Hwi.h>
 
 #include <PERIPHERALS.h>
 #include <io.h>
@@ -138,14 +139,18 @@ uint16_t getLUX(void){
 }
 
 uint8_t getPIR(void) {
+    UInt key = Hwi_disable();
     uint8_t tmp = pirCount;
     pirCount = 0;
+    Hwi_restore(key);
     return tmp;
 }
 
 uint8_t getBMXInts(void) {
+    UInt key = Hwi_disable();
     uint8_t tmp = bmxCount;
     bmxCount = 0;
+    Hwi_restore(key);
     return tmp;
 }
 
