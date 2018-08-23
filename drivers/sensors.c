@@ -128,10 +128,10 @@ uint16_t getLUX(void){
 
     // Test for edge cases
     if (sampleSum <= 0){
-        return 0x00;
+        return 0x0000;
     }
     else if (sampleSum >= (int32_t)(LUX_SAMPLES * LUX_AVG_MAX_VALUE) ){
-        return 0xff;
+        return 0xffff;
     }
 
     return (uint16_t)(sampleSum/(LUX_SAMPLES/LUX_SCALE_MULTIPLIER)); // Returns a value that maximizes the uint16 range

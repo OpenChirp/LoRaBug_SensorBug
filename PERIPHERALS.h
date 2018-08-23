@@ -60,7 +60,7 @@ extern "C" {
 #define MIC_SAMPLES             5000                            // MAXVAL < uint16_t
 #define LUX_SAMPLES             100                             // MAXVAL < uint16_t
 #define LUX_AVG_MIN_VALUE       8.0                             // The average minimum value the sensor reports in complete darkness
-#define LUX_AVG_MAX_VALUE       1200.0                          // Average value when the sensor is exposed to very bright light
+#define LUX_AVG_MAX_VALUE       2400.0                          // Average value when the sensor is exposed to very bright light
 #define LUX_SCALE_MULTIPLIER    (0xffff/LUX_AVG_MAX_VALUE)      // Maximizes the read value to the uint16 scale
 
 /* Macros to define power domain signal levels,
