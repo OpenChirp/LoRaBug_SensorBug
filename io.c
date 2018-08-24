@@ -480,3 +480,9 @@ void uarthexdump(uint8_t *data, size_t size)
         }
     }
 }
+
+void debughexdump(uint8_t *data, size_t size)
+{
+    hexdump(data, size);
+    uarthexdump(data, size);
+}
