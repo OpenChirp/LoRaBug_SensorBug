@@ -253,8 +253,8 @@ static void PrepareTxFrame( uint8_t port )
         // Copy Counter
         memcpy(AppData, &counter, sizeof(counter));
         AppDataSize += sizeof(counter);
-        counter++;
         debugprintf("Counter: %d\r\n", counter);
+        counter++;
 
         // Copy Battery Voltage
         memcpy(AppData + AppDataSize, &batteryVoltage, sizeof(batteryVoltage));
