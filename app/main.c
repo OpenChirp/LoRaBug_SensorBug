@@ -48,6 +48,12 @@ static Event_Struct runtimeEventsStruct;
 static Event_Handle runtimeEvents;
 
 /*------------------------------------------------------------------------*/
+/*                     Configuration                                      */
+/*------------------------------------------------------------------------*/
+
+#define USE_BOARD_UNIQUE_ID_DEV_EUI
+
+/*------------------------------------------------------------------------*/
 /*                      Start of LoRaWan Demo Code                        */
 /*------------------------------------------------------------------------*/
 
@@ -751,6 +757,11 @@ void maintask(UArg arg0, UArg arg1)
     BoardInitMcu( );
     BoardInitPeriph( );
     BoardInitSensors( );
+
+    #ifdef USE_BOARD_UNIQUE_ID_DEV_EUI
+    // Get the 15.4 MAC Addr as DevEuiMAC_15_4_Addr
+    BoardGetUniqueId(DevEui);
+    #endif
 
     debugprintf("# Board initialized\n");
     printLorawanCred();
