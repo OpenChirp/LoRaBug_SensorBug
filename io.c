@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
+#include <stdbool.h>
 
 #include "LORABUG.h"
 #include "PERIPHERALS.h"
@@ -59,6 +60,8 @@ static GateMutexPri_Struct uartMutexStruct;
 // Buffer for snprintf and uartwrite
 static char uartsbuf[UART_PRINTF_BUFFER_SIZE];
 static char uartlinebuf[UART_RECV_LINE_LENGTH + 1]; // +1 for '\0'
+
+static bool ledsEnabled = true;
 
 /*
  * Application LED pin configuration table:
@@ -368,8 +371,30 @@ int getPinInput(PIN_Id pin)
     return (int) PIN_getInputValue(pin);
 }
 
+
+void enableLeds() {
+    ledsEnabled = true;
+}
+
+void disableLeds() {
+    ledsEnabled = false;
+
+    if (PIN_setOutputValue(ledPinHandle, Board_GLED, 0) != PIN_SUCCESS)
+    {
+        System_abort("Failed to set pin value\n");
+    }
+    if (PIN_setOutputValue(ledPinHandle, Board_RLED, 0) != PIN_SUCCESS)
+    {
+        System_abort("Failed to set pin value\n");
+    }
+}
+
 void setLed(PIN_Id pin, uint_t value)
 {
+    if (!ledsEnabled) {
+        return;
+    }
+
     if (PIN_setOutputValue(ledPinHandle, pin, value) != PIN_SUCCESS)
     {
         System_abort("Failed to set pin value\n");
@@ -378,6 +403,10 @@ void setLed(PIN_Id pin, uint_t value)
 
 void toggleLed(PIN_Id pin)
 {
+    if (!ledsEnabled) {
+        return;
+    }
+
     if (PIN_setOutputValue(ledPinHandle, pin, !PIN_getOutputValue(pin))
             != PIN_SUCCESS)
     {

@@ -45,6 +45,8 @@ void setPin(PIN_Id pin, uint_t value);
 void togglePin(PIN_Id pin);
 int  getPinInput(PIN_Id pin);
 
+void enableLeds();
+void disableLeds();
 void setLed(PIN_Id pin, uint_t value);
 void toggleLed(PIN_Id pin);
 
