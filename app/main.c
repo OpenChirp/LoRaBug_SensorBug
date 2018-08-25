@@ -51,6 +51,10 @@ static Event_Handle runtimeEvents;
 /*                     Configuration                                      */
 /*------------------------------------------------------------------------*/
 
+/**@def USE_BOARD_UNIQUE_ID_DEV_EUI
+ * When defined, the DevEUI is set to part of the unique IEEE 802.15.4
+ * given to the MCU at manufacturing time.
+ */
 #define USE_BOARD_UNIQUE_ID_DEV_EUI
 
 /**@def DISABLE_LEDS
@@ -66,9 +70,9 @@ static Event_Handle runtimeEvents;
 /*!
  * Defines the application data transmission duty cycle. 5s, value in [ms].
  */
-//#define APP_TX_DUTYCYCLE                            5000
-//#define APP_TX_DUTYCYCLE                            1000
-#define APP_TX_DUTYCYCLE                            (1000*60*10)
+//#define APP_TX_DUTYCYCLE                            3000         // 3sec - Basically the fastest possible interval
+//#define APP_TX_DUTYCYCLE                            4000         // 4sec
+#define APP_TX_DUTYCYCLE                            (1000*60*15) // 15min
 /*!
  * Defines a random delay for application data transmission duty cycle. 1s,
  * value in [ms].
