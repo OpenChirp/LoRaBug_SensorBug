@@ -1,12 +1,22 @@
 # Example Summary
-This example turns a LoRaBug into a LoRaWAN remote button trigger.
+This example is designed to make use of the [SensorBug accessory board](https://github.com/OpenChirp/LoRaBug/tree/master/Modules/SensorBug).
 Upon powering up, the LoRaBug will attempt to Join the LoRaWAN network
-(unless APB provisioned). Immediately after Joining, it will go to sleep until
-the button is pressed (typically less than 300nA).
-Upon a button press, the LoRaBug will send an unconfirmed LoRaWAN packet
-containing a counter value and it's current battery voltage.
-The payload is the counter followed by the battery voltage as plain uint32s
-in little endian.
+(unless APB provisioned). The green LED will remain on during the join process
+and will turn off when successfully joined.
+After joining, the LoRaBug starts the main runtime, which is configured
+to wake up at preset intervals and set all sensor reading.
+
+Pressing the button, at any time, will result in the following two actions:
+1. Scheduling sensor readings to be sent as soon as possible
+2. If enabled, immediate transmission of BLE advertisements containing the
+   DevEUI and AppKey.
+
+It should also be noted that the LoRaBug will print it's DevEUI and AppKey
+on boot over UART/USB and JTAG.
+The USB/UART is configured to use 115200 baud, 8 data bits, 1 stop bit,
+and not hardware or software flow control.
+Futhermore, debug messages can be read from the device at any time, by simply
+plugging in USB and opening a serial console.
 
 See [app/main.c](app/main.c) for more information.
 
@@ -14,8 +24,8 @@ See [app/main.c](app/main.c) for more information.
 
 | Parameter Name       | Parameter Value  |
 | -------------------- | ---------------- |
-| Incoming Field Names | counter, battery |
-| Incoming Field Types | uint32, uint32   |
+| Incoming Field Names | pktcounter, battery, light, pir, accel, temperature, humidity, pressure, gas_resistance |
+| Incoming Field Types | uint32, uint16, uint16, uint8, uint8, float32, float32, float32, float32 |
 | Endianness           | little           |
 
 
@@ -32,6 +42,8 @@ git submodule update --init --recursive
 * `Board_GLED`
 * `Board_BTN`
 * LoRaWAN
+* BLE
+* Accessory Header with SensorBug Sensors
 
 # Application Design Details
 
