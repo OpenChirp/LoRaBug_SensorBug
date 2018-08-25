@@ -53,6 +53,12 @@ static Event_Handle runtimeEvents;
 
 #define USE_BOARD_UNIQUE_ID_DEV_EUI
 
+/**@def DISABLE_LEDS
+ * When defined, the LEDs will be disabled after successfully
+ * joining the LoRaWAN network.
+ */
+#define DISABLE_LEDS
+
 /*------------------------------------------------------------------------*/
 /*                      Start of LoRaWan Demo Code                        */
 /*------------------------------------------------------------------------*/
@@ -699,6 +705,10 @@ static void MlmeConfirm( MlmeConfirm_t *mlmeConfirm )
                 DeviceState = SendOnJoin ? DEVICE_STATE_SEND:DEVICE_STATE_SLEEP;
 
                 setLed(Board_GLED, 0);
+
+#               ifdef DISABLE_LEDS
+                disableLeds();
+#               endif
             }
             else
             {
@@ -864,8 +874,7 @@ void maintask(UArg arg0, UArg arg1)
                 debugprintf("# DeviceState: DEVICE_STATE_SEND\n");
                 if( NextTx == true )
                 {
-                    PrepareTxFrame( AppPort );
-
+//                    PrepareTxFrame( AppPort );
                     NextTx = SendFrame( );
                 }
                 if( ComplianceTest.Running == true )
