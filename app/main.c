@@ -25,6 +25,7 @@
 #include <string.h> // strlen in uartputs and LoRaWan code
 #include <math.h>
 #include <sensors.h>
+#include <ble_rf.h>
 #include "io.h"
 
 /* LoRa Radio Header files */
@@ -62,6 +63,12 @@ static Event_Handle runtimeEvents;
  * joining the LoRaWAN network.
  */
 #define DISABLE_LEDS
+
+/**@def ENABLE_BLE_ADVERTISEMENT
+ * When defined, we will use BLE to advertise our DevEUI and AppKey
+ * upon a button press.
+ */
+#define ENABLE_BLE_ADVERTISEMENT
 
 /*------------------------------------------------------------------------*/
 /*                      Start of LoRaWan Demo Code                        */
@@ -780,6 +787,9 @@ void maintask(UArg arg0, UArg arg1)
     debugprintf("# Board initialized\n");
     printLorawanCred();
 
+    // Set the DevEUI and AppKey in the BLE payload
+    ble_set_eui_payload(DevEui, AppKey);
+
     DeviceState = DEVICE_STATE_INIT;
 
     while( 1 )
@@ -922,6 +932,11 @@ void maintask(UArg arg0, UArg arg1)
                 DeviceState = DEVICE_STATE_SLEEP;
 
                 printLorawanCred();
+
+#               ifdef ENABLE_BLE_ADVERTISEMENT
+                ble_send_advertisement();
+#               endif
+
                 MibRequestConfirm_t mibReq;
                 LoRaMacStatus_t status;
 
