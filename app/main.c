@@ -24,8 +24,12 @@
 
 #include <string.h> // strlen in uartputs and LoRaWan code
 #include <math.h>
+#include <stdbool.h>
 #include <sensors.h>
 #include <ble_rf.h>
+#include <pb_decode.h>
+#include <pb_encode.h>
+#include <sensorbug.pb.h>
 #include "io.h"
 
 /* LoRa Radio Header files */
@@ -230,13 +234,12 @@ struct ComplianceTest_s
 static void PrepareTxFrame( uint8_t port )
 {
     static uint32_t counter = 1;
-    uint16_t batteryVoltage = 0;
-//    uint8_t batteryLevel = 0;
-    //uint16_t micLevel = 0;
+    uint16_t micLevel = 0;
     uint16_t luxLevel = 0;
-    uint8_t pirLevel = 0;
-    uint8_t bmxInts = 0;
     struct bme680_field_data bmeData;
+
+    SensorBugMessage msg = SensorBugMessage_init_zero;
+    pb_ostream_t stream;
 
     debugprintf("# PrepareTxFrame\n");
 
@@ -244,80 +247,52 @@ static void PrepareTxFrame( uint8_t port )
     {
     case 2:
     {
+        stream = pb_ostream_from_buffer(AppData, sizeof(AppData));
+
         // Layout Of Payload: [(counter-uint32), (batteryvoltage-uint16), ...]
         // Fields: counter, battery, lux, pir, accel, temp, humidity, pressure, gas
         // Types:  uint32, uint16, uint16, uint8, uint8, float32, float32, float32, float32
 
-        batteryVoltage = BoardGetBatteryVoltage();
-//        batteryLevel = BoardGetBatteryLevel();
-
-        pirLevel = getPIR();
         bmeData = getBME();
-        bmxInts = getBMXInts();
 
         // Enable Light/MIC Power
         setPin(DOMAIN1_EN, DOMAIN1_ON);
-        //micLevel = getMIC();
+        micLevel = getMIC();
         luxLevel = getLUX();
         // Disable Light/MIC Power
         setPin(DOMAIN1_EN, DOMAIN1_OFF);
 
-        // Clean Buffer
-        memset(AppData, '\0', sizeof(AppData));
-        AppDataSize = 0;
+        msg.counter        = counter++;
+        msg.battery        = BoardGetBatteryVoltage();
+        msg.light          = (uint32_t)luxLevel;
+        msg.pir_count      = getPIR();
+        msg.motion_count   = getBMXInts();
+        msg.temperature    = bmeData.temperature;
+        msg.humidity       = bmeData.humidity;
+        msg.pressure       = bmeData.pressure;
+        msg.gas_resistance = bmeData.gas_resistance;
+        msg.ambient_noise  = (uint32_t)micLevel;
+        msg.report_period  = 0;
+        msg.motion_en      = true;
 
-        // Copy Counter
-        memcpy(AppData, &counter, sizeof(counter));
-        AppDataSize += sizeof(counter);
-        debugprintf("Counter: %d\r\n", counter);
-        counter++;
 
-        // Copy Battery Voltage
-        memcpy(AppData + AppDataSize, &batteryVoltage, sizeof(batteryVoltage));
-        AppDataSize += sizeof(batteryVoltage);
-        debugprintf("Battery Voltage: %d mV\r\n", batteryVoltage);
+        if (!pb_encode(&stream, SensorBugMessage_fields, &msg)) {
+            debugprintf("Failed to encode data for nanopb");
+            // send anyways
+        }
 
-        // Copy Battery Level
-        //memcpy(AppData + AppDataSize, &batteryLevel, sizeof(batteryLevel));
-        //AppDataSize += sizeof(batteryLevel);
-        //debugprintf("Battery Level: %d/254\r\n", batteryLevel);
+        AppDataSize = (uint8_t)stream.bytes_written;
 
-        // Copy Mic Value
-        //memcpy(AppData + AppDataSize, &micLevel, sizeof(micLevel));
-        //AppDataSize += sizeof(micLevel);
-        //debugprintf("Mic Level: %d\r\n", micLevel);
-
-        // Copy Lux Value
-        memcpy(AppData + AppDataSize, &luxLevel, sizeof(luxLevel));
-        AppDataSize += sizeof(luxLevel);
-        debugprintf("Lux Level: %d\r\n", luxLevel);
-
-        // Copy PIR Value
-        memcpy(AppData + AppDataSize, &pirLevel, sizeof(pirLevel));
-        AppDataSize += sizeof(pirLevel);
-        debugprintf("PIR Level: %d\r\n", pirLevel);
-
-        // Copy Accelerometer Value
-        memcpy(AppData + AppDataSize, &bmxInts, sizeof(bmxInts));
-        AppDataSize += sizeof(bmxInts);
-        debugprintf("Acc Interrupts: %d/255\r\n", bmxInts);
-
-        // Copy Sensors Values, Temperature Humidity, Pressure and Gas Resistance
-        memcpy(AppData + AppDataSize, &bmeData.temperature, sizeof(bmeData.temperature));
-        AppDataSize += sizeof(bmeData.temperature);
-        debugprintf("Temperature: %f degC\r\n", bmeData.temperature);
-
-        memcpy(AppData + AppDataSize, &bmeData.humidity, sizeof(bmeData.humidity));
-        AppDataSize += sizeof(bmeData.humidity);
-        debugprintf("Humidity: %f %%rH\r\n", bmeData.humidity);
-
-        memcpy(AppData + AppDataSize, &bmeData.pressure, sizeof(bmeData.pressure));
-        AppDataSize += sizeof(bmeData.pressure);
-        debugprintf("Pressure: %f hPa\r\n", bmeData.pressure);
-
-        memcpy(AppData + AppDataSize, &bmeData.gas_resistance, sizeof(bmeData.gas_resistance));
-        AppDataSize += sizeof(bmeData.gas_resistance);
-        debugprintf("GasResistance: %f ohms\r\n", bmeData.gas_resistance);
+        debugprintf("Counter: %d\r\n", msg.counter);
+        debugprintf("Battery Voltage: %d mV\r\n", msg.battery);
+        debugprintf("Light Level: %d\r\n", msg.light);
+        debugprintf("PIR Level: %d\r\n", msg.pir_count);
+        debugprintf("Motion Count: %d\r\n", msg.motion_count);
+        debugprintf("Mic Level: %d\r\n", msg.ambient_noise);
+        debugprintf("Temperature: %f degC\r\n", msg.temperature);
+        debugprintf("Humidity: %f %%rH\r\n", msg.humidity);
+        debugprintf("Pressure: %f hPa\r\n", msg.pressure);
+        debugprintf("GasResistance: %f ohms\r\n", msg.gas_resistance);
 
         // TODO
         /* Avoid using measurements from an unstable heating setup */

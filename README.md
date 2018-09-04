@@ -29,6 +29,15 @@ See [app/main.c](app/main.c) for more information.
 | Endianness           | little           |
 
 
+# Easybits Config
+
+| Parameter Name       | Parameter Value  |
+| -------------------- | ---------------- |
+| `rxconfig` | `"counter,uint32,1", "battery,uint32,2", "light,uint32,3", "pir,uint32,4", "motion,uint32,5", "temperature,float,6", "humidity,float,7", "pressure,float,8", "gas,float,9", "noise,uint32,10", "rate,uint32,11", "motionenabled,bool,12"` |
+| `txconfig` | `"set_rate,uint32,11", "set_motionenabled,bool,12"` |
+
+
+
 # Cloning and Submodules
 
 ```
