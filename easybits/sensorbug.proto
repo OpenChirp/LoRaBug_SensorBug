@@ -12,6 +12,6 @@ message SensorBugMessage {
     float  gas_resistance = 9;
     uint32 ambient_noise  = 10;
 
-    uint32 report_periocd = 11; // in seconds
+    uint32 report_period  = 11; // in seconds
     bool   motion_en      = 12;
 }
