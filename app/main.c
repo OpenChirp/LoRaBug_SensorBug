@@ -251,16 +251,15 @@ static void PrepareTxFrame( uint8_t port )
         batteryVoltage = BoardGetBatteryVoltage();
 //        batteryLevel = BoardGetBatteryLevel();
 
-        // Enable Sensors Power
-        setPin(DOMAIN1_EN, DOMAIN1_ON);
-
-        //micLevel = getMIC();
-        luxLevel = getLUX();
         pirLevel = getPIR();
         bmeData = getBME();
         bmxInts = getBMXInts();
 
-        // Disable Sensors Power
+        // Enable Light/MIC Power
+        setPin(DOMAIN1_EN, DOMAIN1_ON);
+        //micLevel = getMIC();
+        luxLevel = getLUX();
+        // Disable Light/MIC Power
         setPin(DOMAIN1_EN, DOMAIN1_OFF);
 
         // Clean Buffer
