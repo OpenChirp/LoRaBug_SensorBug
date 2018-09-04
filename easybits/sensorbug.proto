@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+message SensorBugMessage {
+    uint32 counter        = 1;
+    uint32 battery        = 2; // x1000
+    uint32 light          = 3; // ADC Value 0 - (2^16-1)
+    uint32 pir_count      = 4;
+    uint32 motion_count   = 5;
+    float  temperature    = 6;
+    float  humidity       = 7;
+    float  pressure       = 8;
+    float  gas_resistance = 9;
+
+    uint32 report_period = 10; // in seconds
+    bool   motion_en     = 11;
+}
