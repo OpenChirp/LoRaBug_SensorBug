@@ -13,9 +13,9 @@
 extern void BoardInitSensors(void);
 extern uint16_t getMIC(void);
 extern uint16_t getLUX(void);
-extern uint8_t getPIR(void);
+extern uint32_t getPIR(void);
 extern struct bme680_field_data getBME(void);
-extern uint8_t getBMXInts(void);
+extern uint32_t getBMXInts(void);
 extern void initBMI(void);
 extern void initBMM(void);
 

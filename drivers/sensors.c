@@ -9,6 +9,7 @@
 #include <xdc/runtime/System.h>
 #include <ti/drivers/ADC.h>
 #include <ti/sysbios/hal/Hwi.h>
+#include <stdint.h>
 
 #include <PERIPHERALS.h>
 #include <io.h>
@@ -19,8 +20,8 @@
 
 #include "sensors.h"
 
-volatile static uint8_t pirCount = 0;
-volatile static uint8_t bmxCount = 0;
+volatile static uint32_t pirCount = 0;
+volatile static uint32_t bmxCount = 0;
 
 static PIN_Handle PinHandle;
 static PIN_State PinState;
@@ -33,10 +34,10 @@ static const PIN_Config pinTable[] = {
 
 static void SensorIntHandler(PIN_Handle handle, PIN_Id pinId) {
 
-    if (pinId == PIR_OUT && pirCount < 0xFF)
+    if (pinId == PIR_OUT && pirCount < UINT32_MAX)
         pirCount++;
 
-    if (pinId == BMX_INT1 && bmxCount < 0xFF)
+    if (pinId == BMX_INT1 && bmxCount < UINT32_MAX)
         bmxCount++;
 }
 
@@ -139,7 +140,7 @@ uint16_t getLUX(void){
 
 }
 
-uint8_t getPIR(void) {
+uint32_t getPIR(void) {
     UInt key = Hwi_disable();
     uint8_t tmp = pirCount;
     pirCount = 0;
@@ -147,7 +148,7 @@ uint8_t getPIR(void) {
     return tmp;
 }
 
-uint8_t getBMXInts(void) {
+uint32_t getBMXInts(void) {
     UInt key = Hwi_disable();
     uint8_t tmp = bmxCount;
     bmxCount = 0;
