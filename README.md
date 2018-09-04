@@ -20,15 +20,6 @@ plugging in USB and opening a serial console.
 
 See [app/main.c](app/main.c) for more information.
 
-# ByteTranslator Config
-
-| Parameter Name       | Parameter Value  |
-| -------------------- | ---------------- |
-| Incoming Field Names | pktcounter, battery, light, pir, accel, temperature, humidity, pressure, gas_resistance |
-| Incoming Field Types | uint32, uint16, uint16, uint8, uint8, float32, float32, float32, float32 |
-| Endianness           | little           |
-
-
 # Easybits Config
 
 | Parameter Name       | Parameter Value  |
