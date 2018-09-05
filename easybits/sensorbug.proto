@@ -1,17 +1,29 @@
-syntax = "proto3";
+// We explicitly use proto2 so that we will have the has_* boolean fields
+// in the generated message struct
 
-message SensorBugMessage {
-    uint32 counter        = 1;
-    uint32 battery        = 2; // x1000
-    uint32 light          = 3; // ADC Value 0 - (2^16-1)
-    uint32 pir_count      = 4;
-    uint32 motion_count   = 5;
-    float  temperature    = 6;
-    float  humidity       = 7;
-    float  pressure       = 8;
-    float  gas_resistance = 9;
-    uint32 ambient_noise  = 10;
+syntax = "proto2";
 
-    uint32 report_period  = 11; // in seconds
-    bool   motion_en      = 12;
+message SensorBugUplinkMsg {
+    optional uint32 counter        = 1;
+    optional uint32 battery        = 2; // x1000
+    optional uint32 light          = 3; // ADC Value 0 - (2^16-1)
+    optional uint32 pir_count      = 4;
+    optional uint32 motion_count   = 5;
+    optional float  temperature    = 6;
+    optional float  humidity       = 7;
+    optional float  pressure       = 8;
+    optional float  gas_resistance = 9;
+    optional uint32 ambient_noise  = 10;
+
+    optional uint32 period         = 11; // reporting period in seconds
+    optional bool   motion_en      = 12;
+    optional bool   light_en       = 13;
+    optional bool   mic_en         = 14;
+}
+
+message SensorBugDownlinkMsg {
+    optional uint32 period         = 1; // reporting period in seconds
+    optional bool   motion_en      = 2;
+    optional bool   light_en       = 3;
+    optional bool   mic_en         = 4;
 }
