@@ -9,7 +9,7 @@ to wake up at preset intervals and set all sensor reading.
 Pressing the button, at any time, will result in the following two actions:
 1. Scheduling sensor readings to be sent as soon as possible
 2. If enabled, immediate transmission of BLE advertisements containing the
-   DevEUI and AppKey.
+   DevEUI and AppKey. Using a BLE scanner the a device with the name **'L'** and MAC address **`00:11:22:33:44:55`** will contain two services 0xFA with the LoRa device EUID and 0xFB with the LoRa APPKEY.
 
 It should also be noted that the LoRaBug will print it's DevEUI and AppKey
 on boot over UART/USB and JTAG.
