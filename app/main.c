@@ -238,7 +238,7 @@ static void PrepareTxFrame( uint8_t port )
     uint16_t luxLevel = 0;
     struct bme680_field_data bmeData;
 
-    SensorBugMessage msg = SensorBugMessage_init_zero;
+    SensorBugUplinkMsg msg = SensorBugUplinkMsg_init_zero;
     pb_ostream_t stream;
 
     debugprintf("# PrepareTxFrame\n");
@@ -272,11 +272,11 @@ static void PrepareTxFrame( uint8_t port )
         msg.pressure       = bmeData.pressure;
         msg.gas_resistance = bmeData.gas_resistance;
         msg.ambient_noise  = (uint32_t)micLevel;
-        msg.report_period  = 0;
+        msg.period         = 0;
         msg.motion_en      = true;
 
 
-        if (!pb_encode(&stream, SensorBugMessage_fields, &msg)) {
+        if (!pb_encode(&stream, SensorBugUplinkMsg_fields, &msg)) {
             debugprintf("Failed to encode data for nanopb");
             // send anyways
         }
