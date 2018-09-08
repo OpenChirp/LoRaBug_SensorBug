@@ -521,16 +521,23 @@ static void McpsIndication( McpsIndication_t *mcpsIndication )
         {
         case 1: // The application LED can be controlled on port 1 or 2
         case 2:
-            if( mcpsIndication->BufferSize == 1 )
             {
-                AppLedStateOn = mcpsIndication->Buffer[0] & 0x01;
-                setLed(Board_RLED, ( ( AppLedStateOn & 0x01 ) != 0 ) ? 1 : 0);
-            }
-            break;
+                pb_istream_t stream = pb_istream_from_buffer(mcpsIndication->Buffer, mcpsIndication->BufferSize);
+                SensorBugDownlinkMsg msg = SensorBugDownlinkMsg_init_zero;
+                pb_decode(&stream, SensorBugDownlinkMsg_fields, &msg);
 
+                if (msg.has_period) {
+                    UpdateReportPeriod(msg.period);
                 }
-
-
+                if (msg.has_motion_en) {
+                    UpdateMotionEnabled(msg.motion_en);
+                }
+                if (msg.has_light_en) {
+                    Settings.light_enabled = msg.light_en;
+                }
+                if (msg.has_mic_en) {
+                    Settings.mic_enabled = msg.mic_en;
+                }
             }
             break;
         default:
