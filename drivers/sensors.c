@@ -59,6 +59,28 @@ void BoardInitSensors(bool motion_en) {
 
 }
 
+// From https://gist.github.com/foobaz/3287f153d125277eefea
+uint32_t int_sqrt64(uint64_t x) // 780 µs
+{
+    uint32_t res = 0;
+    uint32_t add = 0x80000000;
+    uint8_t i;
+    for (i = 0; i < 32; i++)
+    {
+        uint32_t temp = res | add;
+        uint64_t g2 = temp;
+        g2 *= temp;
+        if (x >= g2)
+        {
+            res = temp;
+        }
+        add >>= 1;
+    }
+    return res;
+}
+
+uint32_t lastAvg = 0;
+
 uint16_t getMIC(void) {
 
     ADC_Params params;
