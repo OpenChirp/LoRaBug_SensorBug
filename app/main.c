@@ -75,6 +75,36 @@ static Event_Handle runtimeEvents;
 #define ENABLE_BLE_ADVERTISEMENT
 
 /*------------------------------------------------------------------------*/
+/*                          Settings                                      */
+/*------------------------------------------------------------------------*/
+
+typedef struct {
+    uint32_t report_period; // Reporting period in seconds
+    bool     motion_enabled;
+    bool     light_enabled;
+    bool     mic_enabled;
+} settings_t;
+
+static settings_t Settings = {
+  .report_period  = (1000*60*4),
+  .motion_enabled = true,
+  .light_enabled  = true,
+  .mic_enabled    = true,
+};
+
+static void UpdateReportPeriod(uint32_t seconds) {
+    Settings.report_period = seconds;
+}
+
+static void UpdateMotionEnabled(bool motion_enabled) {
+    if (motion_enabled != Settings.motion_enabled) {
+        setupBMI(motion_enabled);
+    }
+    Settings.motion_enabled = motion_enabled;
+}
+
+
+/*------------------------------------------------------------------------*/
 /*                      Start of LoRaWan Demo Code                        */
 /*------------------------------------------------------------------------*/
 
@@ -83,7 +113,8 @@ static Event_Handle runtimeEvents;
  */
 //#define APP_TX_DUTYCYCLE                            3000         // 3sec - Basically the fastest possible interval
 //#define APP_TX_DUTYCYCLE                            4000         // 4sec
-#define APP_TX_DUTYCYCLE                            (1000*60*15) // 15min
+//#define APP_TX_DUTYCYCLE                            (1000*60*15) // 15min
+#define APP_TX_DUTYCYCLE                            (Settings.report_period)
 /*!
  * Defines a random delay for application data transmission duty cycle. 1s,
  * value in [ms].
@@ -589,7 +620,7 @@ void maintask(UArg arg0, UArg arg1)
 
     BoardInitMcu( );
     BoardInitPeriph( );
-    BoardInitSensors( );
+    BoardInitSensors( Settings.motion_en );
 
     #ifdef USE_BOARD_UNIQUE_ID_DEV_EUI
     // Get the 15.4 MAC Addr as DevEuiMAC_15_4_Addr

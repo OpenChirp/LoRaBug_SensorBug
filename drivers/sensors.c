@@ -41,7 +41,7 @@ static void SensorIntHandler(PIN_Handle handle, PIN_Id pinId) {
         bmxCount++;
 }
 
-void BoardInitSensors(void) {
+void BoardInitSensors(bool motion_en) {
 
     // Adds PIR Interrupt Callback
     PinHandle = PIN_open(&PinState, pinTable);
@@ -52,8 +52,10 @@ void BoardInitSensors(void) {
         System_abort("Failed to register pir int callback\n");
     }
 
-    setupBMI(true); // Initialize the Accelerometer in Low-Power mode with Interrupts
-    initBMM();      // Initialize the Magnetometer in Suspend-Modestruct bmi160_int_settg int_config;
+    if (motion_en) {
+        setupBMI(true);  // Initialize the Accelerometer in Low-Power mode with Interrupts
+    }
+    initBMM();           // Initialize the Magnetometer in Suspend-Modestruct bmi160_int_settg int_config;
 
 }
 

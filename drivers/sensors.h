@@ -10,7 +10,7 @@
 #ifndef __SENSORS_H__
 #define __SENSORS_H__
 
-void BoardInitSensors(void);
+void BoardInitSensors(bool motion_en);
 uint16_t getMIC(void);
 uint16_t getLUX(void);
 uint32_t getPIR(void);
