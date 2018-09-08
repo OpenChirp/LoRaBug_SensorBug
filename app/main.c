@@ -713,7 +713,7 @@ void maintask(UArg arg0, UArg arg1)
                 {
                     LoRaMacMlmeRequest( &mlmeReq );
                 }
-                DeviceState = DEVICE_STATE_SEND;
+                DeviceState = DEVICE_STATE_SLEEP;
 #else
                 // Choose a random device address if not already defined in Commissioning.h
                 if( DevAddr == 0 )
