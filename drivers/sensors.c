@@ -142,7 +142,7 @@ uint16_t getLUX(void){
 
 uint32_t getPIR(void) {
     UInt key = Hwi_disable();
-    uint8_t tmp = pirCount;
+    uint32_t tmp = pirCount;
     pirCount = 0;
     Hwi_restore(key);
     return tmp;
@@ -150,7 +150,7 @@ uint32_t getPIR(void) {
 
 uint32_t getBMXInts(void) {
     UInt key = Hwi_disable();
-    uint8_t tmp = bmxCount;
+    uint32_t tmp = bmxCount;
     bmxCount = 0;
     Hwi_restore(key);
     return tmp;
