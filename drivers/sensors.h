@@ -10,13 +10,13 @@
 #ifndef __SENSORS_H__
 #define __SENSORS_H__
 
-extern void BoardInitSensors(void);
-extern uint16_t getMIC(void);
-extern uint16_t getLUX(void);
-extern uint32_t getPIR(void);
-extern struct bme680_field_data getBME(void);
-extern uint32_t getBMXInts(void);
-extern void initBMI(void);
-extern void initBMM(void);
+void BoardInitSensors(void);
+uint16_t getMIC(void);
+uint16_t getLUX(void);
+uint32_t getPIR(void);
+struct bme680_field_data getBME(void);
+uint32_t getBMXInts(void);
+void initBMI(void);
+void initBMM(void);
 
 #endif // __SENSORS_H__
