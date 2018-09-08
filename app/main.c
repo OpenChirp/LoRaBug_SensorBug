@@ -647,7 +647,7 @@ void maintask(UArg arg0, UArg arg1)
 
     BoardInitMcu( );
     BoardInitPeriph( );
-    BoardInitSensors( Settings.motion_en );
+    BoardInitSensors( Settings.motion_enabled );
 
     #ifdef USE_BOARD_UNIQUE_ID_DEV_EUI
     // Get the 15.4 MAC Addr as DevEuiMAC_15_4_Addr
