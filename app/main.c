@@ -139,8 +139,8 @@ static void UpdateMotionEnabled(bool motion_enabled) {
  *
  * \remark Please note that when ADR is enabled the end-device should be static
  */
-#define LORAWAN_ADR_ON                              1
-//#define LORAWAN_ADR_ON                              0
+//#define LORAWAN_ADR_ON                              1
+#define LORAWAN_ADR_ON                              0
 
 
 /*!
@@ -223,7 +223,7 @@ static bool NextTx = true;
 /*!
  * Allow the user to schedule a packet to send immediately when we join
  */
-static bool SendOnJoin = false;
+static bool SendOnJoin = true;
 
 /*!
  * Device states
