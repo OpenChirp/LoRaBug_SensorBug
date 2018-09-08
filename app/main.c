@@ -182,7 +182,8 @@ static uint8_t AppDataSize = LORAWAN_APP_DATA_SIZE;
 /*!
  * User application data buffer size
  */
-#define LORAWAN_APP_DATA_MAX_SIZE                           64
+//#define LORAWAN_APP_DATA_MAX_SIZE                           64
+#define LORAWAN_APP_DATA_MAX_SIZE                           (SensorBugUplinkMsg_size) // max(SensorBugUplinkMsg_size, SensorBugDownlinkMsg_size)
 
 /*!
  * User application data
@@ -252,7 +253,7 @@ static void PrepareTxFrame( uint8_t port )
     uint16_t luxLevel = 0;
     struct bme680_field_data bmeData;
 
-    SensorBugMessage msg = SensorBugMessage_init_zero;
+    SensorBugUplinkMsg msg = SensorBugUplinkMsg_init_zero;
     pb_ostream_t stream;
 
     debugprintf("# PrepareTxFrame\n");
@@ -263,18 +264,21 @@ static void PrepareTxFrame( uint8_t port )
     {
         stream = pb_ostream_from_buffer(AppData, sizeof(AppData));
 
-        // Layout Of Payload: [(counter-uint32), (batteryvoltage-uint16), ...]
-        // Fields: counter, battery, lux, pir, accel, temp, humidity, pressure, gas
-        // Types:  uint32, uint16, uint16, uint8, uint8, float32, float32, float32, float32
-
         bmeData = getBME();
 
-        // Enable Light/MIC Power
-        setPin(DOMAIN1_EN, DOMAIN1_ON);
-        micLevel = getMIC();
-        luxLevel = getLUX();
-        // Disable Light/MIC Power
-        setPin(DOMAIN1_EN, DOMAIN1_OFF);
+        if (Settings.light_enabled || Settings.mic_enabled) {
+            // Enable Light/MIC Power
+            setPin(DOMAIN1_EN, DOMAIN1_ON);
+            if (Settings.light_enabled) {
+                luxLevel = getLUX();
+            }
+            if (Settings.mic_enabled) {
+                micLevel = getMIC();
+            }
+            // Disable Light/MIC Power
+            setPin(DOMAIN1_EN, DOMAIN1_OFF);
+        }
+
 
         msg.counter        = counter++;
         msg.battery        = BoardGetBatteryVoltage();
@@ -286,11 +290,27 @@ static void PrepareTxFrame( uint8_t port )
         msg.pressure       = bmeData.pressure;
         msg.gas_resistance = bmeData.gas_resistance;
         msg.ambient_noise  = (uint32_t)micLevel;
-        msg.report_period  = 0;
-        msg.motion_en      = true;
+        msg.period         = Settings.report_period;
+        msg.motion_en      = Settings.motion_enabled;
+        msg.light_en       = Settings.light_enabled;
+        msg.mic_en         = Settings.mic_enabled;
 
+        msg.has_counter = true;
+        msg.has_battery = true;
+        msg.has_light = Settings.light_enabled;
+        msg.has_pir_count = true;
+        msg.has_motion_count = Settings.motion_enabled;
+        msg.has_temperature = true;
+        msg.has_humidity = true;
+        msg.has_pressure = true;
+        msg.has_gas_resistance = true;
+        msg.has_ambient_noise = Settings.mic_enabled;
+        msg.has_period = true;
+        msg.has_motion_en = true;
+        msg.has_light_en = true;
+        msg.has_mic_en = true;
 
-        if (!pb_encode(&stream, SensorBugMessage_fields, &msg)) {
+        if (!pb_encode(&stream, SensorBugUplinkMsg_fields, &msg)) {
             debugprintf("Failed to encode data for nanopb");
             // send anyways
         }
