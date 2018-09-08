@@ -349,6 +349,8 @@ static bool SendFrame( void )
 
     debugprintf("# SendFrame\n");
 
+    // AppDataSize must be set before calling TxPossible
+    // So, PrepareFrame needs to have already been called.
     if( LoRaMacQueryTxPossible( AppDataSize, &txInfo ) != LORAMAC_STATUS_OK )
     {
         // Send empty frame in order to flush MAC commands
@@ -752,7 +754,7 @@ void maintask(UArg arg0, UArg arg1)
                 debugprintf("# DeviceState: DEVICE_STATE_SEND\n");
                 if( NextTx == true )
                 {
-//                    PrepareTxFrame( AppPort );
+                    PrepareTxFrame( AppPort );
                     NextTx = SendFrame( );
                 }
 
