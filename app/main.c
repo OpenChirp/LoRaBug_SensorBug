@@ -212,23 +212,6 @@ static enum eDeviceState
 }DeviceState;
 
 /*!
- * LoRaWAN compliance tests support data
- */
-struct ComplianceTest_s
-{
-    bool Running;
-    uint8_t State;
-    bool IsTxConfirmed;
-    uint8_t AppPort;
-    uint8_t AppDataSize;
-    uint8_t *AppDataBuffer;
-    uint16_t DownLinkCounter;
-    bool LinkCheck;
-    uint8_t DemodMargin;
-    uint8_t NbGateways;
-}ComplianceTest;
-
-/*!
  * \brief   Prepares the payload of the frame
  */
 static void PrepareTxFrame( uint8_t port )
@@ -302,31 +285,6 @@ static void PrepareTxFrame( uint8_t port )
 
         debugprintf("Total Packet Size: %d bytes\r\n", AppDataSize);
     }
-        break;
-    case 224:
-        if( ComplianceTest.LinkCheck == true )
-        {
-            ComplianceTest.LinkCheck = false;
-            AppDataSize = 3;
-            AppData[0] = 5;
-            AppData[1] = ComplianceTest.DemodMargin;
-            AppData[2] = ComplianceTest.NbGateways;
-            ComplianceTest.State = 1;
-        }
-        else
-        {
-            switch( ComplianceTest.State )
-            {
-            case 4:
-                ComplianceTest.State = 1;
-                break;
-            case 1:
-                AppDataSize = 2;
-                AppData[0] = ComplianceTest.DownLinkCounter >> 8;
-                AppData[1] = ComplianceTest.DownLinkCounter;
-                break;
-            }
-        }
         break;
     default:
         break;
@@ -526,11 +484,6 @@ static void McpsIndication( McpsIndication_t *mcpsIndication )
     // Check Snr
     // Check RxSlot
 
-    if( ComplianceTest.Running == true )
-    {
-        ComplianceTest.DownLinkCounter++;
-    }
-
     if( mcpsIndication->RxData == true )
     {
         switch( mcpsIndication->Port )
@@ -543,119 +496,10 @@ static void McpsIndication( McpsIndication_t *mcpsIndication )
                 setLed(Board_RLED, ( ( AppLedStateOn & 0x01 ) != 0 ) ? 1 : 0);
             }
             break;
-        case 224:
-            if( ComplianceTest.Running == false )
-            {
-                // Check compliance test enable command (i)
-                if( ( mcpsIndication->BufferSize == 4 ) &&
-                    ( mcpsIndication->Buffer[0] == 0x01 ) &&
-                    ( mcpsIndication->Buffer[1] == 0x01 ) &&
-                    ( mcpsIndication->Buffer[2] == 0x01 ) &&
-                    ( mcpsIndication->Buffer[3] == 0x01 ) )
-                {
-                    IsTxConfirmed = false;
-                    AppPort = 224;
-                    AppDataSize = 2;
-                    ComplianceTest.DownLinkCounter = 0;
-                    ComplianceTest.LinkCheck = false;
-                    ComplianceTest.DemodMargin = 0;
-                    ComplianceTest.NbGateways = 0;
-                    ComplianceTest.Running = true;
-                    ComplianceTest.State = 1;
-
-                    MibRequestConfirm_t mibReq;
-                    mibReq.Type = MIB_ADR;
-                    mibReq.Param.AdrEnable = true;
-                    LoRaMacMibSetRequestConfirm( &mibReq );
 
                 }
-            }
-            else
-            {
-                ComplianceTest.State = mcpsIndication->Buffer[0];
-                switch( ComplianceTest.State )
-                {
-                case 0: // Check compliance test disable command (ii)
-                    IsTxConfirmed = LORAWAN_CONFIRMED_MSG_ON;
-                    AppPort = LORAWAN_APP_PORT;
-                    AppDataSize = LORAWAN_APP_DATA_SIZE;
-                    ComplianceTest.DownLinkCounter = 0;
-                    ComplianceTest.Running = false;
 
-                    MibRequestConfirm_t mibReq;
-                    mibReq.Type = MIB_ADR;
-                    mibReq.Param.AdrEnable = LORAWAN_ADR_ON;
-                    LoRaMacMibSetRequestConfirm( &mibReq );
-                    break;
-                case 1: // (iii, iv)
-                    AppDataSize = 2;
-                    break;
-                case 2: // Enable confirmed messages (v)
-                    IsTxConfirmed = true;
-                    ComplianceTest.State = 1;
-                    break;
-                case 3:  // Disable confirmed messages (vi)
-                    IsTxConfirmed = false;
-                    ComplianceTest.State = 1;
-                    break;
-                case 4: // (vii)
-                    AppDataSize = mcpsIndication->BufferSize;
 
-                    AppData[0] = 4;
-                    for( uint8_t i = 1; i < AppDataSize; i++ )
-                    {
-                        AppData[i] = mcpsIndication->Buffer[i] + 1;
-                    }
-                    break;
-                case 5: // (viii)
-                    {
-                        MlmeReq_t mlmeReq;
-                        mlmeReq.Type = MLME_LINK_CHECK;
-                        LoRaMacMlmeRequest( &mlmeReq );
-                    }
-                    break;
-                case 6: // (ix)
-                    {
-                        MlmeReq_t mlmeReq;
-
-                        // Disable TestMode and revert back to normal operation
-                        IsTxConfirmed = LORAWAN_CONFIRMED_MSG_ON;
-                        AppPort = LORAWAN_APP_PORT;
-                        AppDataSize = LORAWAN_APP_DATA_SIZE;
-                        ComplianceTest.DownLinkCounter = 0;
-                        ComplianceTest.Running = false;
-
-                        MibRequestConfirm_t mibReq;
-                        mibReq.Type = MIB_ADR;
-                        mibReq.Param.AdrEnable = LORAWAN_ADR_ON;
-                        LoRaMacMibSetRequestConfirm( &mibReq );
-
-                        mlmeReq.Type = MLME_JOIN;
-
-                        mlmeReq.Req.Join.DevEui = DevEui;
-                        mlmeReq.Req.Join.AppEui = AppEui;
-                        mlmeReq.Req.Join.AppKey = AppKey;
-                        mlmeReq.Req.Join.NbTrials = 3;
-
-                        LoRaMacMlmeRequest( &mlmeReq );
-                        DeviceState = DEVICE_STATE_SLEEP;
-                    }
-                    break;
-                case 7: // (x)
-                    {
-                        if( mcpsIndication->BufferSize == 3 )
-                        {
-                            MlmeReq_t mlmeReq;
-                            mlmeReq.Type = MLME_TXCW;
-                            mlmeReq.Req.TxCw.Timeout = ( uint16_t )( ( mcpsIndication->Buffer[1] << 8 ) | mcpsIndication->Buffer[2] );
-                            LoRaMacMlmeRequest( &mlmeReq );
-                        }
-                        ComplianceTest.State = 1;
-                    }
-                    break;
-                default:
-                    break;
-                }
             }
             break;
         default:
@@ -713,12 +557,6 @@ static void MlmeConfirm( MlmeConfirm_t *mlmeConfirm )
             {
                 // Check DemodMargin
                 // Check NbGateways
-                if( ComplianceTest.Running == true )
-                {
-                    ComplianceTest.LinkCheck = true;
-                    ComplianceTest.DemodMargin = mlmeConfirm->DemodMargin;
-                    ComplianceTest.NbGateways = mlmeConfirm->NbGateways;
-                }
             }
             break;
         }
@@ -865,16 +703,9 @@ void maintask(UArg arg0, UArg arg1)
 //                    PrepareTxFrame( AppPort );
                     NextTx = SendFrame( );
                 }
-                if( ComplianceTest.Running == true )
-                {
-                    // Schedule next packet transmission
-                    TxDutyCycleTime = 5000; // 5000 ms
-                }
-                else
-                {
-                    // Schedule next packet transmission
-                    TxDutyCycleTime = APP_TX_DUTYCYCLE + randr( -APP_TX_DUTYCYCLE_RND, APP_TX_DUTYCYCLE_RND );
-                }
+
+                // Schedule next packet transmission
+                TxDutyCycleTime = APP_TX_DUTYCYCLE + randr( -APP_TX_DUTYCYCLE_RND, APP_TX_DUTYCYCLE_RND );
                 DeviceState = DEVICE_STATE_CYCLE;
                 break;
             }
