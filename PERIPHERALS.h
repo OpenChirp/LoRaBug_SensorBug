@@ -57,12 +57,6 @@ extern "C" {
 #define ADC_INDEX_LUX   LORABUG_ADC0
 #define ADC_INDEX_MIC   LORABUG_ADC2
 
-#define MIC_SAMPLES             5000                            // MAXVAL < uint16_t
-#define LUX_SAMPLES             100                             // MAXVAL < uint16_t
-#define LUX_AVG_MIN_VALUE       8.0                             // The average minimum value the sensor reports in complete darkness
-#define LUX_AVG_MAX_VALUE       2400.0                          // Average value when the sensor is exposed to very bright light
-#define LUX_SCALE_MULTIPLIER    (0xffff/LUX_AVG_MAX_VALUE)      // Maximizes the read value to the uint16 scale
-
 /* Macros to define power domain signal levels,
  * since they have different polarity. */
 #define DOMAIN1_OFF     0
