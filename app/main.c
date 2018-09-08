@@ -206,11 +206,6 @@ static uint32_t TxDutyCycleTime;
 static TimerEvent_t TxNextPacketTimer;
 
 /*!
- * Specifies the state of the application LED
- */
-static bool AppLedStateOn = false;
-
-/*!
  * Timer to handle the state of LED1
  */
 static TimerEvent_t Led1Timer;
@@ -566,7 +561,6 @@ static void McpsIndication( McpsIndication_t *mcpsIndication )
     }
 
     // Switch LED 2 ON for each received downlink
-//    GpioWrite( &Led2, 0 );
     setLed(Board_RLED, 1);
     TimerStart( &Led2Timer );
     Event_post(runtimeEvents, EVENT_STATECHANGE);
@@ -630,7 +624,7 @@ static void ButtonCallback(void) {
     Event_post(runtimeEvents, EVENT_BUTTONPRESSED);
 }
 
-void printLorawanCred() {
+static void printLorawanCred() {
     // Space after 0x, so that it is easy to copy-paste
     debugprintf("# DevEUI: 0x %2.2X%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X\n", DevEui[0], DevEui[1], DevEui[2], DevEui[3], DevEui[4], DevEui[5], DevEui[6], DevEui[7]);
     debugprintf("# AppKey: 0x %2.2X%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X\n", AppKey[0], AppKey[1], AppKey[2], AppKey[3], AppKey[4], AppKey[5], AppKey[6], AppKey[7], AppKey[8], AppKey[9], AppKey[10], AppKey[11], AppKey[12], AppKey[13], AppKey[14], AppKey[15]);
