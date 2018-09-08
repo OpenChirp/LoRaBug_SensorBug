@@ -16,7 +16,7 @@ uint16_t getLUX(void);
 uint32_t getPIR(void);
 struct bme680_field_data getBME(void);
 uint32_t getBMXInts(void);
-void initBMI(void);
+void setupBMI(bool enabled);
 void initBMM(void);
 
 #endif // __SENSORS_H__

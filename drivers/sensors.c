@@ -28,7 +28,7 @@ static PIN_State PinState;
 
 static const PIN_Config pinTable[] = {
     PIR_OUT  | PIN_INPUT_EN | PIN_PULLDOWN | PIN_IRQ_POSEDGE, // PIR seems to push up
-    BMX_INT1 | PIN_INPUT_EN | PIN_NOPULL | PIN_IRQ_NEGEDGE, // BMX is configured to push-pull
+    BMX_INT1 | PIN_INPUT_EN | PIN_NOPULL   | PIN_IRQ_NEGEDGE, // BMX is configured to push-pull
     PIN_TERMINATE
 };
 
@@ -52,8 +52,8 @@ void BoardInitSensors(void) {
         System_abort("Failed to register pir int callback\n");
     }
 
-    initBMI(); // Initialize the Accelerometer in Low-Power mode with Interrupts
-    initBMM(); // Initialize the Magnetometer in Suspend-Modestruct bmi160_int_settg int_config;
+    setupBMI(true); // Initialize the Accelerometer in Low-Power mode with Interrupts
+    initBMM();      // Initialize the Magnetometer in Suspend-Modestruct bmi160_int_settg int_config;
 
 }
 
@@ -217,7 +217,7 @@ struct bme680_field_data getBME(void) {
     return data;
 }
 
-void initBMI(void){
+void setupBMI(bool enabled) {
 
     struct bmi160_dev sensor;
     struct bmi160_int_settg int_config;
@@ -236,9 +236,10 @@ void initBMI(void){
     }
 
     /* Select the power mode */
-    sensor.accel_cfg.power = BMI160_ACCEL_LOWPOWER_MODE;
-    //sensor.accel_cfg.odr = BMI160_ACCEL_ODR_50HZ;
-    //sensor.accel_cfg.range = BMI160_ACCEL_RANGE_2G;
+    sensor.accel_cfg.power = enabled?BMI160_ACCEL_LOWPOWER_MODE:BMI160_ACCEL_SUSPEND_MODE;
+    sensor.accel_cfg.odr = BMI160_ACCEL_ODR_0_78HZ;
+    sensor.accel_cfg.range = BMI160_ACCEL_RANGE_2G;
+    sensor.accel_cfg.bw = BMI160_ACCEL_BW_OSR4_AVG1;
 
     // Gyro is suspended by Default
     //sensor.gyro_cfg.power = BMI160_GYRO_SUSPEND_MODE;
