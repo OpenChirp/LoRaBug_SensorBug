@@ -6,7 +6,7 @@ syntax = "proto2";
 message SensorBugUplinkMsg {
     optional uint32 counter        = 1;
     optional uint32 battery        = 2; // x1000
-    optional uint32 light          = 3; // ADC Value 0 - (2^16-1)
+    optional uint32 light          = 3; // ADC Value 0 - (2^12-1)
     optional uint32 pir_count      = 4;
     optional uint32 motion_count   = 5;
     optional float  temperature    = 6;
