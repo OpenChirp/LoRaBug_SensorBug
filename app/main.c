@@ -119,8 +119,7 @@ static void UpdateMotionEnabled(bool motion_enabled) {
  * Defines a random delay for application data transmission duty cycle. 1s,
  * value in [ms].
  */
-//#define APP_TX_DUTYCYCLE_RND                        1000
-#define APP_TX_DUTYCYCLE_RND                        100
+#define APP_TX_DUTYCYCLE_RND                        1000
 
 /*!
  * Default datarate
@@ -544,7 +543,10 @@ static void McpsIndication( McpsIndication_t *mcpsIndication )
                 pb_decode(&stream, SensorBugDownlinkMsg_fields, &msg);
 
                 if (msg.has_period) {
-                    UpdateReportPeriod(msg.period);
+                    if( msg.period > 5000 && msg.period < (48 * 60* 60 * 1000) ){ // Valid interval 5s to 48h
+                        UpdateReportPeriod(msg.period);
+                        TxDutyCycleTime = (Settings.report_period) + randr( -APP_TX_DUTYCYCLE_RND, APP_TX_DUTYCYCLE_RND );
+                    }
                 }
                 if (msg.has_motion_en) {
                     UpdateMotionEnabled(msg.motion_en);
@@ -759,7 +761,7 @@ void maintask(UArg arg0, UArg arg1)
                 }
 
                 // Schedule next packet transmission
-                TxDutyCycleTime = APP_TX_DUTYCYCLE + randr( -APP_TX_DUTYCYCLE_RND, APP_TX_DUTYCYCLE_RND );
+                TxDutyCycleTime = (Settings.report_period) + randr( -APP_TX_DUTYCYCLE_RND, APP_TX_DUTYCYCLE_RND );
                 DeviceState = DEVICE_STATE_CYCLE;
                 break;
             }
