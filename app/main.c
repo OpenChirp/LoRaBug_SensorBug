@@ -74,26 +74,35 @@ static Event_Handle runtimeEvents;
  */
 #define ENABLE_BLE_ADVERTISEMENT
 
+
+/**@def DEFAULT_REPORT_PERIOD
+ * The default number of seconds between reporting.
+ */
+#define DEFAULT_REPORT_PERIOD 4
+
 /*------------------------------------------------------------------------*/
 /*                          Settings                                      */
 /*------------------------------------------------------------------------*/
 
 typedef struct {
-    uint32_t report_period; // Reporting period in seconds
+    uint32_t report_period; // Reporting period in ms
     bool     motion_enabled;
     bool     light_enabled;
     bool     mic_enabled;
 } settings_t;
 
 static settings_t Settings = {
-  .report_period  = (1000*60*4),
+  .report_period  = DEFAULT_REPORT_PERIOD*1000, // ms
   .motion_enabled = true,
   .light_enabled  = true,
   .mic_enabled    = true,
 };
 
 static void UpdateReportPeriod(uint32_t seconds) {
-    Settings.report_period = seconds;
+    // Valid interval 2s to 48h
+    if( seconds >= 2 && seconds <= (48*60*60) ) {
+        Settings.report_period = seconds*1000;
+    }
 }
 
 static void UpdateMotionEnabled(bool motion_enabled) {
@@ -114,7 +123,8 @@ static void UpdateMotionEnabled(bool motion_enabled) {
 //#define APP_TX_DUTYCYCLE                            3000         // 3sec - Basically the fastest possible interval
 //#define APP_TX_DUTYCYCLE                            4000         // 4sec
 //#define APP_TX_DUTYCYCLE                            (1000*60*15) // 15min
-#define APP_TX_DUTYCYCLE                            (Settings.report_period)
+#define APP_TX_DUTYCYCLE                            Settings.report_period
+
 /*!
  * Defines a random delay for application data transmission duty cycle. 1s,
  * value in [ms].
@@ -543,10 +553,7 @@ static void McpsIndication( McpsIndication_t *mcpsIndication )
                 pb_decode(&stream, SensorBugDownlinkMsg_fields, &msg);
 
                 if (msg.has_period) {
-                    if( msg.period > 5000 && msg.period < (48 * 60* 60 * 1000) ){ // Valid interval 5s to 48h
-                        UpdateReportPeriod(msg.period);
-                        TxDutyCycleTime = (Settings.report_period) + randr( -APP_TX_DUTYCYCLE_RND, APP_TX_DUTYCYCLE_RND );
-                    }
+                    UpdateReportPeriod(msg.period);
                 }
                 if (msg.has_motion_en) {
                     UpdateMotionEnabled(msg.motion_en);
@@ -761,7 +768,7 @@ void maintask(UArg arg0, UArg arg1)
                 }
 
                 // Schedule next packet transmission
-                TxDutyCycleTime = (Settings.report_period) + randr( -APP_TX_DUTYCYCLE_RND, APP_TX_DUTYCYCLE_RND );
+                TxDutyCycleTime = APP_TX_DUTYCYCLE + randr( -APP_TX_DUTYCYCLE_RND, APP_TX_DUTYCYCLE_RND );
                 DeviceState = DEVICE_STATE_CYCLE;
                 break;
             }
