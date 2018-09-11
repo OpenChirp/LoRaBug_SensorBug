@@ -43,8 +43,6 @@
 Task_Struct task0Struct;
 Char task0Stack[TASKSTACKSIZE];
 
-#define LED_ONTIME_MS                               100
-
 /* Runtime Events */
 #define EVENT_STATECHANGE   Event_Id_00
 #define EVENT_BUTTONPRESSED Event_Id_01
@@ -55,6 +53,8 @@ static Event_Handle runtimeEvents;
 /*------------------------------------------------------------------------*/
 /*                     Configuration                                      */
 /*------------------------------------------------------------------------*/
+
+#define LED_ONTIME_MS                               100
 
 /**@def USE_BOARD_UNIQUE_ID_DEV_EUI
  * When defined, the DevEUI is set to part of the unique IEEE 802.15.4
