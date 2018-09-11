@@ -767,8 +767,6 @@ void maintask(UArg arg0, UArg arg1)
                     NextTx = SendFrame( );
                 }
 
-                // Schedule next packet transmission
-                TxDutyCycleTime = APP_TX_DUTYCYCLE + randr( -APP_TX_DUTYCYCLE_RND, APP_TX_DUTYCYCLE_RND );
                 DeviceState = DEVICE_STATE_CYCLE;
                 break;
             }
@@ -778,6 +776,7 @@ void maintask(UArg arg0, UArg arg1)
                 DeviceState = DEVICE_STATE_SLEEP;
 
                 // Schedule next packet transmission
+                TxDutyCycleTime = APP_TX_DUTYCYCLE + randr( -APP_TX_DUTYCYCLE_RND, APP_TX_DUTYCYCLE_RND );
                 TimerSetValue( &TxNextPacketTimer, TxDutyCycleTime );
                 TimerStart( &TxNextPacketTimer );
                 break;
