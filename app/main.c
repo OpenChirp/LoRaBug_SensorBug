@@ -78,40 +78,11 @@ static Event_Handle runtimeEvents;
 /**@def DEFAULT_REPORT_PERIOD
  * The default number of seconds between reporting.
  */
-#define DEFAULT_REPORT_PERIOD 4
+#define DEFAULT_REPORT_PERIOD  4
 
-/*------------------------------------------------------------------------*/
-/*                          Settings                                      */
-/*------------------------------------------------------------------------*/
-
-typedef struct {
-    uint32_t report_period; // Reporting period in ms
-    bool     motion_enabled;
-    bool     light_enabled;
-    bool     mic_enabled;
-} settings_t;
-
-static settings_t Settings = {
-  .report_period  = DEFAULT_REPORT_PERIOD*1000, // ms
-  .motion_enabled = true,
-  .light_enabled  = true,
-  .mic_enabled    = true,
-};
-
-static void UpdateReportPeriod(uint32_t seconds) {
-    // Valid interval 2s to 48h
-    if( seconds >= 2 && seconds <= (48*60*60) ) {
-        Settings.report_period = seconds*1000;
-    }
-}
-
-static void UpdateMotionEnabled(bool motion_enabled) {
-    if (motion_enabled != Settings.motion_enabled) {
-        setupBMI(motion_enabled);
-    }
-    Settings.motion_enabled = motion_enabled;
-}
-
+#define DEFAULT_MOTION_ENABLED true
+#define DEFAULT_LIGHT_ENABLED  true
+#define DEFAULT_MIC_ENABLED    true
 
 /*------------------------------------------------------------------------*/
 /*                      Start of LoRaWan Demo Code                        */
@@ -246,6 +217,53 @@ static enum eDeviceState
     DEVICE_STATE_SLEEP,
     DEVICE_STATE_BUTTON
 }DeviceState;
+
+
+/*------------------------------------------------------------------------*/
+/*                          Settings                                      */
+/*------------------------------------------------------------------------*/
+
+typedef struct {
+    uint32_t report_period; // Reporting period in ms
+    bool     motion_enabled;
+    bool     light_enabled;
+    bool     mic_enabled;
+} settings_t;
+
+static settings_t Settings = {
+  .report_period  = DEFAULT_REPORT_PERIOD*1000, // ms
+  .motion_enabled = DEFAULT_MOTION_ENABLED,
+  .light_enabled  = DEFAULT_LIGHT_ENABLED,
+  .mic_enabled    = DEFAULT_MIC_ENABLED,
+};
+
+static void UpdateReportPeriod(uint32_t seconds) {
+    debugprintf("# UpdatedReportPeriod: %d\r\n", seconds);
+    // Valid interval 1s to 48h
+    if( seconds >= 1 && seconds <= (48*60*60) ) {
+        uint32_t ms = seconds*1000;
+        if (ms != Settings.report_period) {
+            Settings.report_period = ms;
+            TimerStop(&TxNextPacketTimer);
+            DeviceState = DEVICE_STATE_CYCLE;
+            Event_post(runtimeEvents, EVENT_STATECHANGE);
+        }
+    }
+}
+
+static void UpdateMotionEnabled(bool motion_enabled) {
+    debugprintf("# UpdatedMotionEnabled: %s\r\n", motion_enabled?"true":"false");
+    if (motion_enabled != Settings.motion_enabled) {
+        setupBMI(motion_enabled);
+    }
+    Settings.motion_enabled = motion_enabled;
+}
+
+
+/*------------------------------------------------------------------------*/
+/*                          Handlers                                      */
+/*------------------------------------------------------------------------*/
+
 
 /*!
  * \brief   Prepares the payload of the frame
