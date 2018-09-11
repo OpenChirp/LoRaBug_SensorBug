@@ -489,9 +489,6 @@ ADCBufCC26XX_Object adcBufCC26xxObjects[LORABUG_ADCBufCOUNT];
  *  The mapping of dio and internal signals is package dependent.
  */
 const ADCBufCC26XX_AdcChannelLutEntry ADCBufCC26XX_adcChannelLut[] = {
-    {PIN_UNASSIGNED, ADC_COMPB_IN_VDDS},
-    {PIN_UNASSIGNED, ADC_COMPB_IN_DCOUPL},
-    {PIN_UNASSIGNED, ADC_COMPB_IN_VSS},
     {Board_HDR_ADIO0, ADC_COMPB_IN_AUXIO7},
     {Board_HDR_ADIO1, ADC_COMPB_IN_AUXIO6},
     {Board_HDR_ADIO2, ADC_COMPB_IN_AUXIO5},
@@ -500,6 +497,9 @@ const ADCBufCC26XX_AdcChannelLutEntry ADCBufCC26XX_adcChannelLut[] = {
     {Board_HDR_ADIO5, ADC_COMPB_IN_AUXIO2},
     {Board_HDR_ADIO6, ADC_COMPB_IN_AUXIO1},
     {Board_HDR_ADIO7, ADC_COMPB_IN_AUXIO0},
+    {PIN_UNASSIGNED, ADC_COMPB_IN_DCOUPL},
+    {PIN_UNASSIGNED, ADC_COMPB_IN_VSS},
+    {PIN_UNASSIGNED, ADC_COMPB_IN_VDDS},
 };
 
 const ADCBufCC26XX_HWAttrs adcBufCC26xxHWAttrs[LORABUG_ADCBufCOUNT] = {
