@@ -18,10 +18,11 @@
 
 /**@def DEFAULT_MIC_BIAS
  * This is the 12-bit ADC value that we use as first avg offset for stddev calc.
- * The ADC internal reference is 4.3V and the MIC regulated DC bias is 1.8V/2=0.9V.
- * Therefore, the DC bias point should be approximately 0.9V/4.3V * 2^12 = 857.3
+ * The MIC regulated DC bias is 1.8V/2=0.9V.
+ * The corrected and converted ADC values are in microvolts.
+ * Therefore, 0.9V = 900000uV
  */
-#define DEFAULT_MIC_BIAS        857
+#define DEFAULT_MIC_BIAS        900000
 
 void BoardInitSensors(bool motion_en);
 uint16_t getMIC(void);
