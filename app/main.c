@@ -271,7 +271,7 @@ static void UpdateMotionEnabled(bool motion_enabled) {
 static void PrepareTxFrame( uint8_t port )
 {
     static uint32_t counter = 1;
-    uint16_t micLevel = 0;
+    uint32_t noiseLevel = 0;
     uint16_t luxLevel = 0;
     struct bme680_field_data bmeData;
 
@@ -295,7 +295,7 @@ static void PrepareTxFrame( uint8_t port )
                 luxLevel = getLUX();
             }
             if (Settings.mic_enabled) {
-                micLevel = getMIC();
+                noiseLevel = sampleNoise();
             }
             // Disable Light/MIC Power
             setPin(DOMAIN1_EN, DOMAIN1_OFF);
@@ -311,8 +311,8 @@ static void PrepareTxFrame( uint8_t port )
         msg.humidity       = bmeData.humidity;
         msg.pressure       = bmeData.pressure;
         msg.gas_resistance = bmeData.gas_resistance;
-        msg.ambient_noise  = (uint32_t)micLevel;
-        msg.period         = Settings.report_period;
+        msg.ambient_noise  = noiseLevel;
+        msg.period         = Settings.report_period/1000;
         msg.motion_en      = Settings.motion_enabled;
         msg.light_en       = Settings.light_enabled;
         msg.mic_en         = Settings.mic_enabled;
