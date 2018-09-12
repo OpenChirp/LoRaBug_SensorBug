@@ -15,6 +15,7 @@
 #include <ti/drivers/SPI.h>
 #include <ti/drivers/UART.h>
 #include <ti/drivers/ADC.h>
+#include <ti/drivers/ADCBuf.h>
 #include <ti/drivers/I2C.h>
 // #include <ti/drivers/Watchdog.h>
 
@@ -870,6 +871,7 @@ int main(void)
     Board_initSPI();
     Board_initUART();
     Board_initADC();
+    Board_initADCBuf();
     // Board_initWatchdog();
 
     /* Construct heartBeat Task  thread */
