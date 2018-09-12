@@ -180,10 +180,30 @@ uint32_t sampleNoise() {
     return stddev / 1000;
 }
 
+/**
+ * This value is equal to the uV for 1lux.
+ * This corresponds to 0.48uA through 27kOhm resistor.
+ */
+static const uint32_t uVIn1Lux = 48*27*10;
 
 /**
  *
- * @return The average in millivolts
+ * @param uV
+ * @return
+ */
+static inline
+uint32_t microVoltsToMilliLux(uint32_t uV) {
+    // 1lux   = .48uA*27kOhm
+    // 10lux  = 4.8uA*27kOhm
+    // 100lux = 48uA*27kOhm
+
+    return uV*1000 / uVIn1Lux;
+}
+
+
+/**
+ *
+ * @return The average in millilux
  */
 uint32_t sampleLight() {
     ADCBuf_Handle adcBuf;
@@ -199,9 +219,8 @@ uint32_t sampleLight() {
     ADCBufCC26XX_ParamsExtension adcCustomParams = {
         .inputScalingEnabled = true,
         .refSource = ADCBufCC26XX_FIXED_REFERENCE,
-        .samplingMode = ADCBufCC26XX_SAMPING_MODE_ASYNCHRONOUS,
-//        .samplingMode = ADCBufCC26XX_SAMPING_MODE_SYNCHRONOUS,
-        .samplingDuration = ADCBufCC26XX_SAMPLING_DURATION_21P3_US,
+        .samplingMode = ADCBufCC26XX_SAMPING_MODE_SYNCHRONOUS,
+        .samplingDuration = ADCBufCC26XX_SAMPLING_DURATION_5P3_US,
     };
 
     ADCBuf_Params_init(&adcBufParams);
@@ -239,5 +258,5 @@ uint32_t sampleLight() {
     ADCBuf_close(adcBuf);
     Event_destruct(&adcEventsStruct);
 
-    return avg;
+    return microVoltsToMilliLux(avg);
 }

@@ -278,7 +278,7 @@ static void PrepareTxFrame( uint8_t port )
 {
     static uint32_t counter = 1;
     uint32_t noiseLevel = 0;
-    uint16_t luxLevel = 0;
+    uint32_t luxLevel = 0;
     struct bme680_field_data bmeData;
 
     SensorBugUplinkMsg msg = SensorBugUplinkMsg_init_zero;
@@ -298,10 +298,11 @@ static void PrepareTxFrame( uint8_t port )
             // Enable Light/MIC Power
             setPin(DOMAIN1_EN, DOMAIN1_ON);
             // Wait for MIC and Light sensor to stabilize
-            Task_sleep(TIME_MS * MAX(MIC_STABILIZE_TIME_MS, LIGHT_STABILIZE_TIME_MS));
+            Task_sleep(MAX(MIC_STABILIZE_TIME_US, LIGHT_STABILIZE_TIME_US) / Clock_tickPeriod);
             if (Settings.light_enabled) {
                 luxLevel = sampleLight();
             }
+            // MIC takes a while to stabilize, whereas the light sensor is ready within 90us
             if (Settings.mic_enabled) {
                 noiseLevel = sampleNoise();
             }
@@ -312,7 +313,7 @@ static void PrepareTxFrame( uint8_t port )
 
         msg.counter        = counter++;
         msg.battery        = BoardGetBatteryVoltage();
-        msg.light          = (uint32_t)luxLevel;
+        msg.light          = luxLevel;
         msg.pir_count      = getPIR();
         msg.motion_count   = getBMXInts();
         msg.temperature    = bmeData.temperature;
