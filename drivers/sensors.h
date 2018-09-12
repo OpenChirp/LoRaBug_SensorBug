@@ -15,9 +15,7 @@
 #define LUX_AVG_MAX_VALUE       2400.0                          // Average value when the sensor is exposed to very bright light
 #define LUX_SCALE_MULTIPLIER    (0xffff/LUX_AVG_MAX_VALUE)      // Maximizes the read value to the uint16 scale
 
-#define ADCBUFFERSIZE       100
-//#define MIC_SAMPLING_RUNTIME_MS 50                            // 50ms
-//#define MIC_SAMPLING_RUNTIME_MS 100                           // 100ms
+#define ADCBUFFERSIZE           100
 #define MIC_SAMPLING_RUNTIME_MS 500                           // 500ms
 #define MIC_SAMPLING_FREQ       (2*20*1000)                   // 20kHz * 2
 #define MIC_SAMPLING_COUNT      ((MIC_SAMPLING_FREQ/1000) * MIC_SAMPLING_RUNTIME_MS) // Number of total samples to span SAMPLING_RUNTIME_MS
