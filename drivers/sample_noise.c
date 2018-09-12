@@ -72,7 +72,7 @@ static Event_Handle adcEvents;
  * sent to the PC via UART.
  *
  */
-void adcBufCallback(ADCBuf_Handle handle, ADCBuf_Conversion *conversion, void *completedADCBuffer, uint32_t completedChannel) {
+static void adcBufCallback(ADCBuf_Handle handle, ADCBuf_Conversion *conversion, void *completedADCBuffer, uint32_t completedChannel) {
 
     uint_fast16_t i, sampleCount;
     if (samplesCountdown <= ADCBUFFERSIZE) {
@@ -88,7 +88,7 @@ void adcBufCallback(ADCBuf_Handle handle, ADCBuf_Conversion *conversion, void *c
     ADCBuf_adjustRawValues(handle, completedADCBuffer, sampleCount, completedChannel);
     ADCBuf_convertAdjustedToMicroVolts(handle, completedChannel, completedADCBuffer, microVoltBuffer, sampleCount);
 
-    void (*reduce)(uint32_t microVoltReadin) = conversion->arg;
+    void (*reduce)(uint32_t microVoltReadin) = (void (*)(uint32_t))conversion->arg;
     for (i = 0; i < sampleCount; i++) {
         reduce(microVoltBuffer[i]);
     }
@@ -107,7 +107,7 @@ static void micReduce(uint32_t microVoltReading) {
     int64_t square = int_square((int64_t)val - (int64_t)lastMICAvg);
     // Check for overflow
     if (sampleSquaredSum > (sampleSquaredSum+square)) {
-        sampleSquaredSum = -1;
+        sampleSquaredSum = (uint64_t)-1;
         System_abort("Overflow detected in sample noise");
     }
     sampleSquaredSum += square;
