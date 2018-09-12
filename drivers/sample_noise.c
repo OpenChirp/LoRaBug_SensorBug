@@ -45,14 +45,6 @@ uint32_t int_sqrt64(uint64_t x) // 780 µs
 }
 
 
-#define ADCBUFFERSIZE       100
-//#define SAMPLING_RUNTIME_MS 50                            // 50ms
-//#define SAMPLING_RUNTIME_MS 100                           // 100ms
-#define SAMPLING_RUNTIME_MS 500                           // 500ms
-#define SAMPLING_FREQ       (2*20*1000)                   // 20kHz * 2
-#define SAMPLING_COUNT      ((SAMPLING_FREQ/1000) * SAMPLING_RUNTIME_MS) // Number of total samples to span SAMPLING_RUNTIME_MS
-//#define ADC_BUFFERS_COUNT   ((SAMPLING_COUNT + ADCBUFFERSIZE - 1)/ ADCBUFFERSIZE) // Number of ADC buffers we need in order to fetch a min of SAMPLING_COUNT
-
 static uint16_t sampleBufferOne[ADCBUFFERSIZE];
 static uint16_t sampleBufferTwo[ADCBUFFERSIZE];
 static uint32_t microVoltBuffer[ADCBUFFERSIZE];
@@ -140,7 +132,7 @@ uint32_t sampleNoise() {
     adcBufParams.callbackFxn = adcBufCallback;
     adcBufParams.recurrenceMode = ADCBuf_RECURRENCE_MODE_CONTINUOUS;
     adcBufParams.returnMode = ADCBuf_RETURN_MODE_CALLBACK;
-    adcBufParams.samplingFrequency = SAMPLING_FREQ;
+    adcBufParams.samplingFrequency = MIC_SAMPLING_FREQ;
     adcBufParams.custom = &adcCustomParams;
     adcBuf = ADCBuf_open(Board_ADCBuf0, &adcBufParams);
 
@@ -156,7 +148,7 @@ uint32_t sampleNoise() {
         System_abort("adcBuf did not open correctly\n");
     }
 
-    samplesCountdown = SAMPLING_COUNT;
+    samplesCountdown = MIC_SAMPLING_COUNT;
     sampleSum        = 0;
     sampleSquaredSum = 0;
 
@@ -166,7 +158,7 @@ uint32_t sampleNoise() {
         System_abort("Did not start conversion process correctly\n");
     }
     Event_pend(adcEvents, Event_Id_NONE, EVENT_SAMPLING_FINISHED, BIOS_WAIT_FOREVER);
-    uint32_t avg =  sampleSum / SAMPLING_COUNT;
+    uint32_t avg =  sampleSum / MIC_SAMPLING_COUNT;
     uint32_t newavg = (lastMICAvg + avg) / 2;
 
     debugprintf("Old AVG = %d\n", lastMICAvg);
@@ -175,7 +167,7 @@ uint32_t sampleNoise() {
 
     lastMICAvg = newavg;
 
-    uint64_t variance = sampleSquaredSum / SAMPLING_COUNT;
+    uint64_t variance = sampleSquaredSum / MIC_SAMPLING_COUNT;
     uint32_t stddev = int_sqrt64(variance);
     debugprintf("STDDEV = %d\n", stddev);
 
