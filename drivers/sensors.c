@@ -59,67 +59,6 @@ void BoardInitSensors(bool motion_en) {
 
 }
 
-// From https://gist.github.com/foobaz/3287f153d125277eefea
-uint32_t int_sqrt64(uint64_t x) // 780 µs
-{
-    uint32_t res = 0;
-    uint32_t add = 0x80000000;
-    uint8_t i;
-    for (i = 0; i < 32; i++)
-    {
-        uint32_t temp = res | add;
-        uint64_t g2 = temp;
-        g2 *= temp;
-        if (x >= g2)
-        {
-            res = temp;
-        }
-        add >>= 1;
-    }
-    return res;
-}
-
-uint32_t lastAvg = 0;
-
-uint16_t getMIC(void) {
-
-    ADC_Params params;
-    ADC_Handle adc;
-    int_fast16_t res;
-    uint16_t adcValue, minV = 0xFFFF, maxV = 0, count = 0;
-    uint32_t sampleSum = 0;
-
-    ADC_Params_init(&params);
-    adc = ADC_open(ADC_INDEX_MIC, &params);
-
-    if (adc == NULL) {
-        uartprintf("ADC err\r\n");
-        //System_abort("ADC err\n");
-    }
-
-    while(count < MIC_SAMPLES) {
-        res = ADC_convert(adc, &adcValue);
-        if (res == ADC_STATUS_SUCCESS) {
-            if(maxV < adcValue) maxV = adcValue;
-            if(minV > adcValue) minV = adcValue;
-            sampleSum += adcValue;
-            count++;
-        }
-        else {
-            uartprintf("ADConverr\r\n");
-            System_abort("ADC err\n");
-        }
-    }
-    ADC_close(adc);
-    uartprintf("MIC min: %d\r\n" , minV);
-    uartprintf("MIC max: %d\r\n", maxV);
-    uartprintf("MIC max-min: %d\r\n", maxV-minV);
-    uartprintf("MIC avg: %d in %d samples\r\n", (sampleSum/MIC_SAMPLES), count);
-
-    //return (uint16_t)(maxV-minV);
-    return (uint16_t)(sampleSum/MIC_SAMPLES);
-}
-
 uint16_t getLUX(void){
     ADC_Params params;
     ADC_Handle adc;

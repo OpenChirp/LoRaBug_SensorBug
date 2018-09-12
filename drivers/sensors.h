@@ -10,7 +10,6 @@
 #ifndef __SENSORS_H__
 #define __SENSORS_H__
 
-#define MIC_SAMPLES             5000                            // MAXVAL < uint16_t
 #define LUX_SAMPLES             100                             // MAXVAL < uint16_t
 #define LUX_AVG_MIN_VALUE       8.0                             // The average minimum value the sensor reports in complete darkness
 #define LUX_AVG_MAX_VALUE       2400.0                          // Average value when the sensor is exposed to very bright light
@@ -25,7 +24,6 @@
 #define DEFAULT_MIC_BIAS        900000
 
 void BoardInitSensors(bool motion_en);
-uint16_t getMIC(void);
 uint32_t sampleNoise(void);
 uint16_t getLUX(void);
 uint32_t getPIR(void);
