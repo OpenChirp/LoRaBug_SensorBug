@@ -300,7 +300,7 @@ static void PrepareTxFrame( uint8_t port )
             // Wait for MIC and Light sensor to stabilize
             Task_sleep(TIME_MS * MAX(MIC_STABILIZE_TIME_MS, LIGHT_STABILIZE_TIME_MS));
             if (Settings.light_enabled) {
-                luxLevel = getLUX();
+                luxLevel = sampleLight();
             }
             if (Settings.mic_enabled) {
                 noiseLevel = sampleNoise();
