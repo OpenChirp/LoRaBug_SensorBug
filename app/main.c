@@ -86,6 +86,11 @@ static Event_Handle runtimeEvents;
 #define DEFAULT_MIC_ENABLED    true
 
 /*------------------------------------------------------------------------*/
+/*                          Convenience                                   */
+/*------------------------------------------------------------------------*/
+#define MAX(x,y) ( (x>y) ? x : y )
+
+/*------------------------------------------------------------------------*/
 /*                      Start of LoRaWan Demo Code                        */
 /*------------------------------------------------------------------------*/
 
@@ -292,6 +297,8 @@ static void PrepareTxFrame( uint8_t port )
         if (Settings.light_enabled || Settings.mic_enabled) {
             // Enable Light/MIC Power
             setPin(DOMAIN1_EN, DOMAIN1_ON);
+            // Wait for MIC and Light sensor to stabilize
+            Task_sleep(TIME_MS * MAX(MIC_STABILIZE_TIME_MS, LIGHT_STABILIZE_TIME_MS));
             if (Settings.light_enabled) {
                 luxLevel = getLUX();
             }
