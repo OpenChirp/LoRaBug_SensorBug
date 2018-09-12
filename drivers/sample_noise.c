@@ -44,13 +44,10 @@ uint32_t int_sqrt64(uint64_t x) // 780 µs
     return res;
 }
 
-
 static uint16_t sampleBufferOne[ADCBUFFERSIZE];
 static uint16_t sampleBufferTwo[ADCBUFFERSIZE];
 static uint32_t microVoltBuffer[ADCBUFFERSIZE];
 static uint32_t samplesCountdown = 0;
-
-static uint32_t lastMICAvg = DEFAULT_MIC_BIAS;
 
 #define EVENT_SAMPLING_FINISHED Event_Id_00
 static Event_Struct adcEventsStruct;
@@ -93,6 +90,8 @@ static void adcBufCallback(ADCBuf_Handle handle, ADCBuf_Conversion *conversion, 
 static uint64_t sampleSum;
 static uint64_t sampleSquaredSum;
 
+static uint32_t lastMICAvg = DEFAULT_MIC_BIAS;
+
 static void micReduce(uint32_t microVoltReading) {
     uint64_t val = microVoltReading;
     sampleSum += val;
@@ -103,6 +102,10 @@ static void micReduce(uint32_t microVoltReading) {
         System_abort("Overflow detected in sample noise");
     }
     sampleSquaredSum += square;
+}
+
+static void sumReduce(uint32_t microVoltReading) {
+    sampleSum += (uint64_t)microVoltReading;
 }
 
 /**
@@ -161,18 +164,80 @@ uint32_t sampleNoise() {
     uint32_t avg =  sampleSum / MIC_SAMPLING_COUNT;
     uint32_t newavg = (lastMICAvg + avg) / 2;
 
-    debugprintf("Old AVG = %d\n", lastMICAvg);
-    debugprintf("AVG = %d\n", avg);
-    debugprintf("New AVG = %d\n", newavg);
+    debugprintf("MIC Old AVG = %d\n", lastMICAvg);
+    debugprintf("MIC AVG = %d\n", avg);
+    debugprintf("MIC New AVG = %d\n", newavg);
 
     lastMICAvg = newavg;
 
     uint64_t variance = sampleSquaredSum / MIC_SAMPLING_COUNT;
     uint32_t stddev = int_sqrt64(variance);
-    debugprintf("STDDEV = %d\n", stddev);
+    debugprintf("MIC STDDEV = %d\n", stddev);
 
     ADCBuf_close(adcBuf);
     Event_destruct(&adcEventsStruct);
 
     return stddev / 1000;
+}
+
+
+/**
+ *
+ * @return The average in millivolts
+ */
+uint32_t sampleLight() {
+    ADCBuf_Handle adcBuf;
+    ADCBuf_Params adcBufParams;
+    ADCBuf_Conversion continuousConversion;
+
+    debugprintf("Sampling Light\r\n");
+
+    Event_construct(&adcEventsStruct, NULL);
+    adcEvents = Event_handle(&adcEventsStruct);
+
+    /* Set up an ADCBuf peripheral in ADCBuf_RECURRENCE_MODE_CONTINUOUS */
+    ADCBufCC26XX_ParamsExtension adcCustomParams = {
+        .inputScalingEnabled = true,
+        .refSource = ADCBufCC26XX_FIXED_REFERENCE,
+        .samplingMode = ADCBufCC26XX_SAMPING_MODE_ASYNCHRONOUS,
+//        .samplingMode = ADCBufCC26XX_SAMPING_MODE_SYNCHRONOUS,
+        .samplingDuration = ADCBufCC26XX_SAMPLING_DURATION_21P3_US,
+    };
+
+    ADCBuf_Params_init(&adcBufParams);
+    adcBufParams.callbackFxn = adcBufCallback;
+    adcBufParams.recurrenceMode = ADCBuf_RECURRENCE_MODE_CONTINUOUS;
+    adcBufParams.returnMode = ADCBuf_RETURN_MODE_CALLBACK;
+    adcBufParams.samplingFrequency = LIGHT_SAMPLING_FREQ;
+    adcBufParams.custom = &adcCustomParams;
+    adcBuf = ADCBuf_open(Board_ADCBuf0, &adcBufParams);
+
+
+    /* Configure the conversion struct */
+    continuousConversion.arg = (void *)sumReduce;
+    continuousConversion.adcChannel = ADC_INDEX_LUX;
+    continuousConversion.sampleBuffer = sampleBufferOne;
+    continuousConversion.sampleBufferTwo = sampleBufferTwo;
+    continuousConversion.samplesRequestedCount = ADCBUFFERSIZE;
+
+    if (!adcBuf){
+        System_abort("adcBuf did not open correctly\n");
+    }
+
+    samplesCountdown = LIGHT_SAMPLING_COUNT;
+    sampleSum        = 0;
+
+    /* Start converting. */
+    if (ADCBuf_convert(adcBuf, &continuousConversion, 1) != ADCBuf_STATUS_SUCCESS) {
+        System_abort("Did not start conversion process correctly\n");
+    }
+    Event_pend(adcEvents, Event_Id_NONE, EVENT_SAMPLING_FINISHED, BIOS_WAIT_FOREVER);
+    uint32_t avg =  sampleSum / LIGHT_SAMPLING_COUNT;
+
+    debugprintf("Light AVG = %d\n", avg);
+
+    ADCBuf_close(adcBuf);
+    Event_destruct(&adcEventsStruct);
+
+    return avg;
 }

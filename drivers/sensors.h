@@ -22,6 +22,8 @@
 #define MIC_SAMPLING_FREQ       (2*20*1000)                   // 20kHz * 2
 #define MIC_SAMPLING_COUNT      ((MIC_SAMPLING_FREQ/1000) * MIC_SAMPLING_RUNTIME_MS) // Number of total samples to span SAMPLING_RUNTIME_MS
 //#define MIC_ADC_BUFFERS_COUNT   ((SAMPLING_COUNT + ADCBUFFERSIZE - 1)/ ADCBUFFERSIZE) // Number of ADC buffers we need in order to fetch a min of SAMPLING_COUNT
+#define LIGHT_SAMPLING_FREQ     500                           // 500Hz
+#define LIGHT_SAMPLING_COUNT    100                           // 100
 
 #define MIC_STABILIZE_TIME_MS   200                             // The time required for the MIC output to stabilize
 #define LIGHT_STABILIZE_TIME_MS 1                               //TODO The time required for the light sensor to stabilize
@@ -36,6 +38,7 @@
 
 void BoardInitSensors(bool motion_en);
 uint32_t sampleNoise(void);
+uint32_t sampleLight(void);
 uint16_t getLUX(void);
 uint32_t getPIR(void);
 struct bme680_field_data getBME(void);
