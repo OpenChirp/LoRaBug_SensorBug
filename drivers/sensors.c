@@ -59,50 +59,6 @@ void BoardInitSensors(bool motion_en) {
 
 }
 
-uint16_t getLUX(void){
-    ADC_Params params;
-    ADC_Handle adc;
-
-    int_fast16_t res;
-    uint16_t adcValue, count = 0;
-    int32_t sampleSum = 0;
-
-    ADC_Params_init(&params);
-    adc = ADC_open(ADC_INDEX_LUX, &params);
-
-    if (adc == NULL) {
-        uartprintf("ADC err\r\n");
-        //System_abort("ADC err\n");
-    }
-
-    while(count < LUX_SAMPLES) {
-        res = ADC_convert(adc, &adcValue);
-        if (res == ADC_STATUS_SUCCESS) {
-            sampleSum += adcValue;
-            count++;
-        }
-        else {
-            uartprintf("ADConverr\r\n");
-            //System_abort("ADC err\n");
-        }
-
-    }
-    ADC_close(adc);
-
-    sampleSum -= (uint32_t)(LUX_AVG_MIN_VALUE * LUX_SAMPLES);
-
-    // Test for edge cases
-    if (sampleSum <= 0){
-        return 0x0000;
-    }
-    else if (sampleSum >= (int32_t)(LUX_SAMPLES * LUX_AVG_MAX_VALUE) ){
-        return 0xffff;
-    }
-
-    return (uint16_t)(sampleSum/(LUX_SAMPLES/LUX_SCALE_MULTIPLIER)); // Returns a value that maximizes the uint16 range
-
-}
-
 uint32_t getPIR(void) {
     UInt key = Hwi_disable();
     uint32_t tmp = pirCount;

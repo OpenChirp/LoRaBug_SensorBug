@@ -10,11 +10,6 @@
 #ifndef __SENSORS_H__
 #define __SENSORS_H__
 
-#define LUX_SAMPLES             100                             // MAXVAL < uint16_t
-#define LUX_AVG_MIN_VALUE       8.0                             // The average minimum value the sensor reports in complete darkness
-#define LUX_AVG_MAX_VALUE       2400.0                          // Average value when the sensor is exposed to very bright light
-#define LUX_SCALE_MULTIPLIER    (0xffff/LUX_AVG_MAX_VALUE)      // Maximizes the read value to the uint16 scale
-
 #define ADCBUFFERSIZE           100
 #define MIC_SAMPLING_RUNTIME_MS 500                           // 500ms
 #define MIC_SAMPLING_FREQ       (2*20*1000)                   // 20kHz * 2
@@ -37,7 +32,6 @@
 void BoardInitSensors(bool motion_en);
 uint32_t sampleNoise(void);
 uint32_t sampleLight(void);
-uint16_t getLUX(void);
 uint32_t getPIR(void);
 struct bme680_field_data getBME(void);
 uint32_t getBMXInts(void);
