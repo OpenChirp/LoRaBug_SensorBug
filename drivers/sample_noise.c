@@ -64,9 +64,6 @@ static uint32_t lastMICAvg = DEFAULT_MIC_BIAS;
 static Event_Struct adcEventsStruct;
 static Event_Handle adcEvents;
 
-static uint64_t sampleSum;
-static uint64_t sampleSquaredSum;
-
 #define MIN(x,y) ( (x < y) ? x : y )
 
 /*
@@ -91,22 +88,29 @@ void adcBufCallback(ADCBuf_Handle handle, ADCBuf_Conversion *conversion, void *c
     ADCBuf_adjustRawValues(handle, completedADCBuffer, sampleCount, completedChannel);
     ADCBuf_convertAdjustedToMicroVolts(handle, completedChannel, completedADCBuffer, microVoltBuffer, sampleCount);
 
+    void (*reduce)(uint32_t microVoltReadin) = conversion->arg;
     for (i = 0; i < sampleCount; i++) {
-        uint64_t val = microVoltBuffer[i];
-        sampleSum += val;
-        int64_t square = int_square((int64_t)val - (int64_t)lastMICAvg);
-        // Check for overflow
-        if (sampleSquaredSum > (sampleSquaredSum+square)) {
-            sampleSquaredSum = -1;
-            System_abort("Overflow detected in sample noise");
-            continue;
-        }
-        sampleSquaredSum += square;
+        reduce(microVoltBuffer[i]);
     }
 
     if (samplesCountdown == 0) {
         Event_post(adcEvents, EVENT_SAMPLING_FINISHED);
     }
+}
+
+static uint64_t sampleSum;
+static uint64_t sampleSquaredSum;
+
+static void micReduce(uint32_t microVoltReading) {
+    uint64_t val = microVoltReading;
+    sampleSum += val;
+    int64_t square = int_square((int64_t)val - (int64_t)lastMICAvg);
+    // Check for overflow
+    if (sampleSquaredSum > (sampleSquaredSum+square)) {
+        sampleSquaredSum = -1;
+        System_abort("Overflow detected in sample noise");
+    }
+    sampleSquaredSum += square;
 }
 
 /**
@@ -142,7 +146,7 @@ uint32_t sampleNoise() {
 
 
     /* Configure the conversion struct */
-    continuousConversion.arg = NULL;
+    continuousConversion.arg = (void *)micReduce;
     continuousConversion.adcChannel = ADC_INDEX_MIC;
     continuousConversion.sampleBuffer = sampleBufferOne;
     continuousConversion.sampleBufferTwo = sampleBufferTwo;
