@@ -24,7 +24,7 @@ See [app/main.c](app/main.c) for more information.
 
 | Parameter Name       | Parameter Value  |
 | -------------------- | ---------------- |
-| `rxconfig` | `"counter,uint32,1", "battery,uint32,2", "light,uint32,3", "pir,uint32,4", "motion,uint32,5", "temperature,float,6", "humidity,float,7", "pressure,float,8", "gas,float,9", "noise,uint32,10", "rate,uint32,11", "motionenabled,bool,12", "set_lightenabled,bool,13", "set_micenabled,bool,14"` |
+| `rxconfig` | `"counter,uint32,1", "battery,uint32,2", "light,uint32,3", "pir,uint32,4", "motion,uint32,5", "temperature,float,6", "humidity,float,7", "pressure,float,8", "gas,float,9", "noise,uint32,10", "rate,uint32,11", "motionenabled,bool,12", "lightenabled,bool,13", "micenabled,bool,14"` |
 | `txconfig` | `"set_rate,uint32,1", "set_motionenabled,bool,2", "set_lightenabled,bool,3", "set_micenabled,bool,4"` |
 
 
