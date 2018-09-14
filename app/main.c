@@ -85,6 +85,18 @@ static Event_Handle runtimeEvents;
 #define DEFAULT_LIGHT_ENABLED  true
 #define DEFAULT_MIC_ENABLED    true
 
+/**@def CALIBRATION_MODE_LIGHT
+ * When set, the main task will continuously call the sampleLight
+ * function and print it's results using \a debugprintf.
+ */
+//#define CALIBRATION_MODE_LIGHT
+
+/**@def CALIBRATION_MODE_NOISE
+ * When set, the main task will continuously call the sampleNoise
+ * function and print it's results using \a debugprintf.
+ */
+//#define CALIBRATION_MODE_NOISE
+
 /*------------------------------------------------------------------------*/
 /*                          Convenience                                   */
 /*------------------------------------------------------------------------*/
@@ -669,6 +681,45 @@ static void printLorawanCred() {
     debugprintf("# AppKey: 0x %2.2X%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X\n", AppKey[0], AppKey[1], AppKey[2], AppKey[3], AppKey[4], AppKey[5], AppKey[6], AppKey[7], AppKey[8], AppKey[9], AppKey[10], AppKey[11], AppKey[12], AppKey[13], AppKey[14], AppKey[15]);
 }
 
+
+/* Define Calibration Functions */
+#if defined(CALIBRATION_MODE_LIGHT) || defined(CALIBRATION_MODE_NOISE)
+static void lightCalibration() {
+    debugprintf("Sampling Light\r\n");
+    uint32_t mlux = sampleLight();
+    debugprintf("# Light = %d mlux = %f lux\r\n", mlux, (float)mlux / 1000.0);
+}
+static void noiseCalibration() {
+    debugprintf("Sampling Noise\r\n");
+    uint32_t mv = sampleNoise();
+    debugprintf("# Noise = %d mV = %f V\r\n", mv, (double)mv / 1000.0);
+}
+
+static void calibrationMode() {
+    // Setting callback to NULL will re-enable the push-to-bootload functionality
+    // This allows for one press programming using the bootloader.
+    setBtnCallback(NULL);
+    // Turn on the red LED to indicate we are in calibration mode
+    setLed(Board_RLED, 1);
+    // Turn on power to the MIC and Light sensor
+    setPin(DOMAIN1_EN, DOMAIN1_ON);
+    // Wait for MIC and Light sensor to stabilize
+    Task_sleep(MYMAX(MIC_STABILIZE_TIME_US, LIGHT_STABILIZE_TIME_US) / Clock_tickPeriod);
+
+    // Loop forever in calibration loop
+    while (true) {
+
+#       ifdef CALIBRATION_MODE_LIGHT
+        lightCalibration();
+#       endif
+#       ifdef CALIBRATION_MODE_NOISE
+        noiseCalibration();
+#       endif
+
+    }// while(true)
+}
+#endif
+
 void maintask(UArg arg0, UArg arg1)
 {
     LoRaMacPrimitives_t LoRaMacPrimitives;
@@ -692,6 +743,10 @@ void maintask(UArg arg0, UArg arg1)
 
     // Set the DevEUI and AppKey in the BLE payload
     ble_set_eui_payload(DevEui, AppKey);
+
+#if defined(CALIBRATION_MODE_LIGHT) || defined(CALIBRATION_MODE_NOISE)
+    calibrationMode();
+#endif
 
     DeviceState = DEVICE_STATE_INIT;
 
