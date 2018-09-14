@@ -88,7 +88,7 @@ static Event_Handle runtimeEvents;
 /*------------------------------------------------------------------------*/
 /*                          Convenience                                   */
 /*------------------------------------------------------------------------*/
-#define MAX(x,y) ( (x>y) ? x : y )
+#define MYMAX(x,y) ( (x>y) ? x : y )
 
 /*------------------------------------------------------------------------*/
 /*                      Start of LoRaWan Demo Code                        */
@@ -298,7 +298,7 @@ static void PrepareTxFrame( uint8_t port )
             // Enable Light/MIC Power
             setPin(DOMAIN1_EN, DOMAIN1_ON);
             // Wait for MIC and Light sensor to stabilize
-            Task_sleep(MAX(MIC_STABILIZE_TIME_US, LIGHT_STABILIZE_TIME_US) / Clock_tickPeriod);
+            Task_sleep(MYMAX(MIC_STABILIZE_TIME_US, LIGHT_STABILIZE_TIME_US) / Clock_tickPeriod);
             if (Settings.light_enabled) {
                 luxLevel = sampleLight();
             }
