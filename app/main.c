@@ -575,6 +575,7 @@ static void McpsIndication( McpsIndication_t *mcpsIndication )
         case 1: // The application LED can be controlled on port 1 or 2
         case 2:
             {
+                debugprintf("# Got Downlink Message\r\n");
                 pb_istream_t stream = pb_istream_from_buffer(mcpsIndication->Buffer, mcpsIndication->BufferSize);
                 SensorBugDownlinkMsg msg = SensorBugDownlinkMsg_init_zero;
                 pb_decode(&stream, SensorBugDownlinkMsg_fields, &msg);
