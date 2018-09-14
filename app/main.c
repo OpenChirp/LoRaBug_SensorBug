@@ -79,7 +79,7 @@ static Event_Handle runtimeEvents;
 /**@def DEFAULT_REPORT_PERIOD
  * The default number of seconds between reporting.
  */
-#define DEFAULT_REPORT_PERIOD  4
+#define DEFAULT_REPORT_PERIOD  10
 
 #define DEFAULT_MOTION_ENABLED true
 #define DEFAULT_LIGHT_ENABLED  true
