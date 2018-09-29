@@ -28,7 +28,10 @@
 #include <ti/sysbios/gates/GateMutexPri.h>
 #include <ti/sysbios/knl/Clock.h>
 
+/* Non-RTOS Drivers */
 #include <driverlib/sys_ctrl.h> // SysCtrlSystemReset()
+
+#include "io.h"
 
 /* Settings */
 #define UART_PRINTF_BUFFER_SIZE 128 // Should be a minimum of 5+17 for uarthexdump
@@ -124,7 +127,7 @@ static void buttonClockCb(UArg arg)
         /* Take button action - now that we have confirmed the proper edge */
         if (btnCallback == NULL)
         {
-            SysCtrlSystemReset();
+            hardreset();
         }
         btnCallback();
     }
@@ -514,4 +517,8 @@ void debughexdump(uint8_t *data, size_t size)
 {
     hexdump(data, size);
     uarthexdump(data, size);
+}
+
+inline void hardreset() {
+    SysCtrlSystemReset();
 }

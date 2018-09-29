@@ -56,6 +56,8 @@ void hexdump(uint8_t *data, size_t size);
 void uarthexdump(uint8_t *data, size_t size);
 void debughexdump(uint8_t *data, size_t size);
 
+void hardreset();
+
 #ifdef __cplusplus
 }
 #endif
