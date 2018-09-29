@@ -26,4 +26,6 @@ message SensorBugDownlinkMsg {
     optional bool   motion_en      = 2;
     optional bool   light_en       = 3;
     optional bool   mic_en         = 4;
+
+    optional bool   cmd_reset      = 10; // command device to do hard reset
 }

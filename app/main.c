@@ -592,6 +592,10 @@ static void McpsIndication( McpsIndication_t *mcpsIndication )
                 SensorBugDownlinkMsg msg = SensorBugDownlinkMsg_init_zero;
                 pb_decode(&stream, SensorBugDownlinkMsg_fields, &msg);
 
+                if (msg.has_cmd_reset && msg.cmd_reset) {
+                    // Will never return from this
+                    hardreset();
+                }
                 if (msg.has_period) {
                     UpdateReportPeriod(msg.period);
                 }
