@@ -19,6 +19,10 @@ message SensorBugUplinkMsg {
     optional bool   motion_en      = 12;
     optional bool   light_en       = 13;
     optional bool   mic_en         = 14;
+
+    // v2.1 would be major=2 minor=1
+    optional uint32 sw_version_major = 128; // software version - major
+    optional uint32 sw_version_minor = 129; // software version - minor
 }
 
 message SensorBugDownlinkMsg {
