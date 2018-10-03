@@ -133,8 +133,8 @@ const uint32_t software_ver_minor = 1;
 /*!
  * LoRaWAN confirmed messages
  */
-//#define LORAWAN_CONFIRMED_MSG_ON                    true
-#define LORAWAN_CONFIRMED_MSG_ON                    false
+#define LORAWAN_CONFIRMED_MSG_ON                    true
+//#define LORAWAN_CONFIRMED_MSG_ON                    false
 
 /*!
  * LoRaWAN Adaptive Data Rate
