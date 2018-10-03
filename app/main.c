@@ -85,7 +85,7 @@ const uint32_t software_ver_minor = 1;
  */
 #define DEFAULT_REPORT_PERIOD  10
 
-#define DEFAULT_MOTION_ENABLED true
+#define DEFAULT_MOTION_ENABLED false
 #define DEFAULT_LIGHT_ENABLED  true
 #define DEFAULT_MIC_ENABLED    true
 
