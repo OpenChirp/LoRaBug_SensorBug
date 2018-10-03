@@ -89,6 +89,8 @@ const uint32_t software_ver_minor = 1;
 #define DEFAULT_LIGHT_ENABLED  true
 #define DEFAULT_MIC_ENABLED    true
 
+#define BUTTON_AS_RESET
+
 /**@def CALIBRATION_MODE_LIGHT
  * When set, the main task will continuously call the sampleLight
  * function and print it's results using \a debugprintf.
@@ -598,6 +600,7 @@ static void McpsIndication( McpsIndication_t *mcpsIndication )
 
                 if (msg.has_cmd_reset && msg.cmd_reset) {
                     // Will never return from this
+                    debugprintf("# Hard Resetting\r\n");
                     hardreset();
                 }
                 if (msg.has_period) {
@@ -888,6 +891,7 @@ void maintask(UArg arg0, UArg arg1)
             {
                 debugprintf("# DeviceState: DEVICE_STATE_BUTTON\n");
 
+#ifndef BUTTON_AS_RESET
                 DeviceState = DEVICE_STATE_SLEEP;
 
                 printLorawanCred();
@@ -919,6 +923,17 @@ void maintask(UArg arg0, UArg arg1)
                 TimerStart( &Led2Timer );
 
                 setLed(Board_GLED, 1); // denote busy - turned off on send confirm
+
+                // If still depressed 1 sec later - reset into bootloader
+                Task_sleep(TIME_MS * 1000);
+                if (!getButtonState()) {
+                    hardreset();
+                }
+#else
+                // Will reset in 1 sec -- hold button to trigger bootload on boot
+                Task_sleep(TIME_MS * 1000);
+                hardreset();
+#endif
                 break;
             }
             default:

@@ -50,6 +50,7 @@ void disableLeds();
 void setLed(PIN_Id pin, uint_t value);
 void toggleLed(PIN_Id pin);
 
+int getButtonState();
 void setBtnCallback(void (*callback)(void));
 
 void hexdump(uint8_t *data, size_t size);

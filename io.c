@@ -417,6 +417,11 @@ void toggleLed(PIN_Id pin)
     }
 }
 
+int getButtonState()
+{
+    return (int) PIN_getInputValue(Board_BTN);
+}
+
 void setBtnCallback(void (*callback)(void))
 {
     btnCallback = callback;
