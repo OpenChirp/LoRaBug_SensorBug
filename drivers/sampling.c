@@ -251,9 +251,9 @@ uint32_t sampleLight() {
         System_abort("Did not start conversion process correctly\n");
     }
     Event_pend(adcEvents, Event_Id_NONE, EVENT_SAMPLING_FINISHED, BIOS_WAIT_FOREVER);
-    uint32_t avg =  sampleSum / LIGHT_SAMPLING_COUNT;
+    uint64_t avg =  sampleSum / LIGHT_SAMPLING_COUNT;
 
-    debugprintf("Light AVG = %d\n", avg);
+    debugprintf("Light AVG = %llu = %f V\n", avg, ((double)avg)/1000.0/1000.0);
 
     ADCBuf_close(adcBuf);
     Event_destruct(&adcEventsStruct);
