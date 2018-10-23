@@ -359,6 +359,9 @@ static void PrepareTxFrame( uint8_t port )
         msg.motion_en      = Settings.motion_enabled;
         msg.light_en       = Settings.light_enabled;
         msg.mic_en         = Settings.mic_enabled;
+        // Version info should probably only be sent once on join
+        msg.sw_version_major = software_ver_major;
+        msg.sw_version_minor = software_ver_minor;
 
         msg.has_counter = true;
         msg.has_battery = true;
@@ -374,6 +377,8 @@ static void PrepareTxFrame( uint8_t port )
         msg.has_motion_en = true;
         msg.has_light_en = true;
         msg.has_mic_en = true;
+        msg.has_sw_version_major = true;
+        msg.has_sw_version_minor = true;
 
         if (!pb_encode(&stream, SensorBugUplinkMsg_fields, &msg)) {
             debugprintf("Failed to encode data for nanopb");
