@@ -39,6 +39,11 @@
 #include "LoRaMac.h"
 #include "Commissioning.h"
 
+
+/*------------------------------------------------------------------------*/
+/*                       Basic Setup                                      */
+/*------------------------------------------------------------------------*/
+
 #define TASKSTACKSIZE   2048
 
 Task_Struct task0Struct;
