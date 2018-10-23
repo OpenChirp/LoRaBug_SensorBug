@@ -667,7 +667,7 @@ const WatchdogCC26XX_HWAttrs watchdogCC26XXHWAttrs[LORABUG_WATCHDOGCOUNT] = {
     {
         .baseAddr = WDT_BASE,
         .intNum = INT_WDT_IRQ,
-        .reloadValue = 1000 /* Reload value in milliseconds */
+        .reloadValue = 5*1000 /* Reload value in milliseconds - (=5 sec) */
     },
 };
 

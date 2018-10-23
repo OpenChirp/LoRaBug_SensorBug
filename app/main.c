@@ -17,7 +17,7 @@
 #include <ti/drivers/ADC.h>
 #include <ti/drivers/ADCBuf.h>
 #include <ti/drivers/I2C.h>
-// #include <ti/drivers/Watchdog.h>
+#include <ti/drivers/Watchdog.h>
 
 /* Board Header files */
 #include "LORABUG.h"
@@ -91,6 +91,12 @@ const uint32_t software_ver_minor = 1;
 
 #define BUTTON_AS_RESET
 
+/**@def WATCHDOG_ENABLED
+ * When defined, the watchdog will be setup and used.
+ * Please check the default duration(in ms) in LORABUG.c .
+ */
+//#define WATCHDOG_ENABLED
+
 /**@def CALIBRATION_MODE_LIGHT
  * When set, the main task will continuously call the sampleLight
  * function and print it's results using \a debugprintf.
@@ -106,7 +112,17 @@ const uint32_t software_ver_minor = 1;
 /*------------------------------------------------------------------------*/
 /*                          Convenience                                   */
 /*------------------------------------------------------------------------*/
+
 #define MYMAX(x,y) ( (x>y) ? x : y )
+
+
+/*------------------------------------------------------------------------*/
+/*                            Globals                                     */
+/*------------------------------------------------------------------------*/
+
+#ifdef WATCHDOG_ENABLED
+static Watchdog_Handle watchdog;
+#endif
 
 /*------------------------------------------------------------------------*/
 /*                      Start of LoRaWan Demo Code                        */
@@ -879,6 +895,9 @@ void maintask(UArg arg0, UArg arg1)
             case DEVICE_STATE_SLEEP:
             {
                 debugprintf("# DeviceState: DEVICE_STATE_SLEEP\n");
+#ifdef WATCHDOG_ENABLED
+                Watchdog_clear(watchdog);
+#endif
                 // Wake up through events
                 UInt events = Event_pend(runtimeEvents, Event_Id_NONE, EVENT_STATECHANGE|EVENT_BUTTONPRESSED, BIOS_WAIT_FOREVER);
                 // If only button press event (priority to STATECHANGE)
@@ -960,7 +979,7 @@ int main(void)
     Board_initUART();
     Board_initADC();
     Board_initADCBuf();
-    // Board_initWatchdog();
+    Board_initWatchdog();
 
     /* Construct heartBeat Task  thread */
     Task_Params_init(&taskParams);
@@ -969,6 +988,19 @@ int main(void)
     taskParams.stack = &task0Stack;
     Task_construct(&task0Struct, (Task_FuncPtr) maintask, &taskParams,
                    NULL);
+
+    /* Setup watchdog */
+#ifdef WATCHDOG_ENABLED
+    // Default Functionality:
+    // * HardReset when watchdog is upset
+    // * Allow stalling the watchdog when debugger is at breakpoint
+    // * No callback
+    watchdog = Watchdog_open(LORABUG_WATCHDOG0, NULL);
+    if (watchdog == NULL) {
+        System_abort("Failed to open watchdog");
+    }
+    Watchdog_clear(watchdog);
+#endif
 
     /* Open and setup pins */
     setuppins();
