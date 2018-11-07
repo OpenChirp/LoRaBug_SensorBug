@@ -332,8 +332,14 @@ static void PrepareTxFrame( uint8_t port )
     case 2:
     {
         stream = pb_ostream_from_buffer(AppData, sizeof(AppData));
+        // We would prefer to concurrently do MIC and BME polling
+        int bmeSched = 0;
+        if (Settings.light_enabled)
+            bmeSched = 1;
+        if (Settings.mic_enabled)
+            bmeSched = 2;
 
-        bmeData = getBME();
+
 
         if (Settings.light_enabled || Settings.mic_enabled) {
             // Enable Light/MIC Power
@@ -342,15 +348,25 @@ static void PrepareTxFrame( uint8_t port )
             Task_sleep(MYMAX(MIC_STABILIZE_TIME_US, LIGHT_STABILIZE_TIME_US) / Clock_tickPeriod);
             if (Settings.light_enabled) {
                 sampleLightStart();
+                if (bmeSched == 1) {
+                    bmeData = getBME();
+                }
                 luxLevel = sampleLightWaitResult();
             }
             // MIC takes a while to stabilize, whereas the light sensor is ready within 90us
             if (Settings.mic_enabled) {
                 sampleNoiseStart();
+                if (bmeSched == 2) {
+                    bmeData = getBME();
+                }
                 noiseLevel = sampleNoiseWaitResult();
             }
             // Disable Light/MIC Power
             setPin(DOMAIN1_EN, DOMAIN1_OFF);
+        }
+
+        if (bmeSched == 0) {
+            bmeData = getBME();
         }
 
 
