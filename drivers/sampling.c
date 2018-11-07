@@ -62,7 +62,6 @@ static Event_Handle adcEvents;
  *
  */
 static void adcBufCallback(ADCBuf_Handle handle, ADCBuf_Conversion *conversion, void *completedADCBuffer, uint32_t completedChannel) {
-
     uint_fast16_t i, sampleCount;
     if (samplesCountdown <= ADCBUFFERSIZE) {
         ADCBuf_convertCancel(handle);

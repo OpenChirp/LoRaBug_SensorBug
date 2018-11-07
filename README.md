@@ -87,3 +87,8 @@ variable declaration. For this reason, you MUST change the C compiler Language
 mode to allow C99 syntax.
 Currently, the C99 syntax usage is isolated to the
 [LoRaMac.c](loramac/src/mac/LoRaMac.c) file.
+
+## Stack Space Optimizations
+It should be noted that the native vsnprintf and vprintf consume tons of stack
+space (about 1,300 bytes) when called, whereas the xdc System_vsnprintf
+and System_vprintf only consume about 144 bytes of stack space.
