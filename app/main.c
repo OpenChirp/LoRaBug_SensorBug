@@ -46,8 +46,8 @@
 
 #define TASKSTACKSIZE   2048
 
-Task_Struct task0Struct;
-Char task0Stack[TASKSTACKSIZE];
+static Task_Struct mainTaskStruct;
+static Char mainTaskStack[TASKSTACKSIZE];
 
 /* Runtime Events */
 #define EVENT_STATECHANGE   Event_Id_00
@@ -1000,8 +1000,8 @@ int main(void)
     Task_Params_init(&taskParams);
     taskParams.arg0 = 1000000 / Clock_tickPeriod;
     taskParams.stackSize = TASKSTACKSIZE;
-    taskParams.stack = &task0Stack;
-    Task_construct(&task0Struct, (Task_FuncPtr) maintask, &taskParams,
+    taskParams.stack = &mainTaskStack;
+    Task_construct(&mainTaskStruct, (Task_FuncPtr) maintask, &taskParams,
                    NULL);
 
     /* Setup watchdog */
