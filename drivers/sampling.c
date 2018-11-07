@@ -31,6 +31,11 @@
  */
 //#define ENABLE_TIMING_MEASUREMENTS
 
+
+/*--------------------------------------------------------*
+ *                    Math Functions                      *
+ *--------------------------------------------------------*/
+
 static inline
 int64_t int_square(int64_t x) {
     return x*x;
@@ -56,6 +61,10 @@ uint32_t int_sqrt64(uint64_t x) // 780 µs
     }
     return res;
 }
+
+/*--------------------------------------------------------*
+ *                    Setup Variable                      *
+ *--------------------------------------------------------*/
 
 static ADCBuf_Handle adcBuf;
 static ADCBuf_Params adcBufParams;
@@ -150,6 +159,31 @@ static void sumReduce(uint32_t microVoltReading) {
     sampleSum += (uint64_t)microVoltReading;
 }
 
+
+/**
+ * This value is equal to the uV for 1lux.
+ * This corresponds to 0.48uA through 27kOhm resistor.
+ */
+static const uint32_t uVIn1Lux = 48*27*10;
+
+/**
+ *
+ * @param uV
+ * @return
+ */
+static inline
+uint32_t microVoltsToMilliLux(uint32_t uV) {
+    // 1lux   = .48uA*27kOhm
+    // 10lux  = 4.8uA*27kOhm
+    // 100lux = 48uA*27kOhm
+
+    return uV*1000 / uVIn1Lux;
+}
+
+/*--------------------------------------------------------*
+ *                  Interface Functions                   *
+ *--------------------------------------------------------*/
+
 /**
  *
  */
@@ -222,26 +256,6 @@ uint32_t sampleNoiseWaitResult() {
     Event_destruct(&adcEventsStruct);
 
     return stddev / 1000;
-}
-
-/**
- * This value is equal to the uV for 1lux.
- * This corresponds to 0.48uA through 27kOhm resistor.
- */
-static const uint32_t uVIn1Lux = 48*27*10;
-
-/**
- *
- * @param uV
- * @return
- */
-static inline
-uint32_t microVoltsToMilliLux(uint32_t uV) {
-    // 1lux   = .48uA*27kOhm
-    // 10lux  = 4.8uA*27kOhm
-    // 100lux = 48uA*27kOhm
-
-    return uV*1000 / uVIn1Lux;
 }
 
 
