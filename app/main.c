@@ -316,11 +316,13 @@ static void UpdateMotionEnabled(bool motion_enabled) {
 static void PrepareTxFrame( uint8_t port )
 {
     static uint32_t counter = 1;
+    static SensorBugUplinkMsg msg; // reduce stack allocation
+
+    memset(&msg, 0, sizeof(msg)); // msg=SensorBugUplinkMsg_init_zero
     uint32_t noiseLevel = 0;
     uint32_t luxLevel = 0;
     struct bme680_field_data *bmeData;
 
-    SensorBugUplinkMsg msg = SensorBugUplinkMsg_init_zero;
     pb_ostream_t stream;
 
     debugprintf("# PrepareTxFrame\n");
@@ -619,9 +621,10 @@ static void McpsIndication( McpsIndication_t *mcpsIndication )
         case 1: // The application LED can be controlled on port 1 or 2
         case 2:
             {
+                static SensorBugDownlinkMsg msg;
                 debugprintf("# Got Downlink Message\r\n");
                 pb_istream_t stream = pb_istream_from_buffer(mcpsIndication->Buffer, mcpsIndication->BufferSize);
-                SensorBugDownlinkMsg msg = SensorBugDownlinkMsg_init_zero;
+                memset(&msg, 0, sizeof(msg)); // msg=SensorBugDownlinkMsg_init_zero;
                 pb_decode(&stream, SensorBugDownlinkMsg_fields, &msg);
 
                 if (msg.has_cmd_reset && msg.cmd_reset) {
