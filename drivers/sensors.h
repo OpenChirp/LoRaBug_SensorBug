@@ -32,7 +32,7 @@ void BoardInitSensors(bool motion_en);
 uint32_t sampleNoise(void);
 uint32_t sampleLight(void);
 uint32_t getPIR(void);
-struct bme680_field_data getBME(void);
+struct bme680_field_data *getBME(void);
 uint32_t getBMXInts(void);
 void setupBMI(bool enabled);
 void initBMM(void);

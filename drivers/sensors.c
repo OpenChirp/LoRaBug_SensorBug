@@ -75,10 +75,11 @@ uint32_t getBMXInts(void) {
     return tmp;
 }
 
-struct bme680_field_data getBME(void) {
+static struct bme680_field_data data;
 
+struct bme680_field_data *getBME(void) {
     struct bme680_dev gas_sensor;
-    struct bme680_field_data data;
+
     int8_t rslt = BME680_OK;
     uint16_t meas_period;
     uint8_t set_required_settings;
@@ -96,8 +97,8 @@ struct bme680_field_data getBME(void) {
     //Initializing object to default values
     rslt = bme680_init(&gas_sensor);
     if(rslt != BME680_OK){
-        uartprintf("BME680 Init fail\r\n");
-        return data;
+        debugprintf("BME680 Init fail\r\n");
+        return &data;
     }
 
     /* Set the temperature, pressure and humidity settings */
@@ -118,13 +119,13 @@ struct bme680_field_data getBME(void) {
 
     /* Set the desired sensor configuration */
     if(bme680_set_sensor_settings(set_required_settings,&gas_sensor) != 0) {
-        uartprintf("BME680 Sensor settings set fail\r\n");
-        return data;
+        debugprintf("BME680 Sensor settings set fail\r\n");
+        return &data;
     }
 
     /* Set the power mode */
     if(bme680_set_sensor_mode(&gas_sensor) != 0) {
-        uartprintf("BME680 Power mode fail \r\n");
+        debugprintf("BME680 Power mode fail \r\n");
     }
 
     bme680_get_profile_dur(&meas_period, &gas_sensor);
@@ -133,7 +134,7 @@ struct bme680_field_data getBME(void) {
     bme680_get_sensor_data(&data, &gas_sensor);
     data.pressure = data.pressure / 100.0; // result is x100
 
-    return data;
+    return &data;
 }
 
 void setupBMI(bool enabled) {

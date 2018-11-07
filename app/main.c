@@ -318,7 +318,7 @@ static void PrepareTxFrame( uint8_t port )
     static uint32_t counter = 1;
     uint32_t noiseLevel = 0;
     uint32_t luxLevel = 0;
-    struct bme680_field_data bmeData;
+    struct bme680_field_data *bmeData;
 
     SensorBugUplinkMsg msg = SensorBugUplinkMsg_init_zero;
     pb_ostream_t stream;
@@ -355,10 +355,10 @@ static void PrepareTxFrame( uint8_t port )
         msg.light          = luxLevel;
         msg.pir_count      = getPIR();
         msg.motion_count   = getBMXInts();
-        msg.temperature    = bmeData.temperature;
-        msg.humidity       = bmeData.humidity;
-        msg.pressure       = bmeData.pressure;
-        msg.gas_resistance = bmeData.gas_resistance;
+        msg.temperature    = bmeData->temperature;
+        msg.humidity       = bmeData->humidity;
+        msg.pressure       = bmeData->pressure;
+        msg.gas_resistance = bmeData->gas_resistance;
         msg.ambient_noise  = noiseLevel;
         msg.period         = Settings.report_period/1000;
         msg.motion_en      = Settings.motion_enabled;
@@ -405,7 +405,7 @@ static void PrepareTxFrame( uint8_t port )
 
         // TODO
         /* Avoid using measurements from an unstable heating setup */
-        if(!(bmeData.status & BME680_GASM_VALID_MSK)){
+        if(!(bmeData->status & BME680_GASM_VALID_MSK)){
             debugprintf("Gas Resistance is not Valid!\r\n");
         }
 
