@@ -127,7 +127,7 @@ uint32_t sampleNoise() {
         .refSource = ADCBufCC26XX_FIXED_REFERENCE,
         .samplingMode = ADCBufCC26XX_SAMPING_MODE_ASYNCHRONOUS,
 //        .samplingMode = ADCBufCC26XX_SAMPING_MODE_SYNCHRONOUS,
-        .samplingDuration = ADCBufCC26XX_SAMPLING_DURATION_21P3_US,
+//        .samplingDuration = ADCBufCC26XX_SAMPLING_DURATION_21P3_US,
     };
 
     ADCBuf_Params_init(&adcBufParams);
