@@ -8,7 +8,10 @@
 #include <xdc/std.h>
 #include <xdc/runtime/System.h>
 #include <ti/drivers/ADC.h>
+
+/* BIOS Header files */
 #include <ti/sysbios/hal/Hwi.h>
+
 #include <stdint.h>
 
 #include <PERIPHERALS.h>

@@ -1021,8 +1021,7 @@ int main(void)
     taskParams.arg0 = 1000000 / Clock_tickPeriod;
     taskParams.stackSize = TASKSTACKSIZE;
     taskParams.stack = &mainTaskStack;
-    Task_construct(&mainTaskStruct, (Task_FuncPtr) maintask, &taskParams,
-                   NULL);
+    Task_construct(&mainTaskStruct, (Task_FuncPtr) maintask, &taskParams, NULL);
 
     /* Setup watchdog */
 #ifdef WATCHDOG_ENABLED
