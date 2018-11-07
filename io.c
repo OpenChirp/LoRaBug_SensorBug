@@ -335,28 +335,6 @@ char *uartreadline()
     return uartlinebuf;
 }
 
-#ifndef DISABLE_DEBUG_PRINT
-/**
- * Printf to UART and JTAG
- *
- * @note This CANNOT be used in a Hwi or Swi (pin callbacks included), since this function blocks in uart
- */
-void debugprintf(const char *format, ...)
-{
-    va_list args;
-    va_start(args, format);
-
-    // Print to JTAG debugger
-    // System_vprintf only consumes about 144 bytes stack space, whereas vprintf consumes 1,300 bytes
-    System_vprintf(format, args);
-    System_flush();
-    // Print to UART console
-    uartvprintf(format, args);
-
-    va_end(args);
-}
-#endif
-
 void setPin(PIN_Id pin, uint_t value)
 {
     if (PIN_setOutputValue(hdrPinHandle, pin, value) != PIN_SUCCESS)
@@ -522,14 +500,6 @@ void uarthexdump(uint8_t *data, size_t size)
         }
     }
 }
-
-#ifndef DISABLE_DEBUG_PRINT
-void debughexdump(uint8_t *data, size_t size)
-{
-    hexdump(data, size);
-    uarthexdump(data, size);
-}
-#endif
 
 inline void hardreset() {
     SysCtrlSystemReset();
