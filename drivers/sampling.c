@@ -14,9 +14,22 @@
 
 #include <PERIPHERALS.h>
 #include <io.h>
+#include <error.h>
 #include "sensors.h"
 
 #include <math.h>
+
+/*--------------------------------------------------------*
+ *                    Configuration                       *
+ *--------------------------------------------------------*/
+
+/**@def ENABLE_TIMING_MEASUREMENTS
+ * When enabled, the the two uint64_t variables
+ * durationNs and periodNs are written to with the duration
+ * of the adcbuf handler function and the period between calls
+ * to the adcbuf handler function, respectively,
+ */
+//#define ENABLE_TIMING_MEASUREMENTS
 
 static inline
 int64_t int_square(int64_t x) {
@@ -58,6 +71,22 @@ static Event_Handle adcEvents;
 
 #define MIN(x,y) ( ((x) < (y)) ? (x) : (y) )
 
+#ifdef ENABLE_TIMING_MEASUREMENTS
+Types_Timestamp64 start, end;
+Types_Timestamp64 lastStart = {0, 0};
+
+/// The duration in nanoseconds that it took to finish
+/// the adcBufCallback function.
+volatile uint64_t durationNs; // inspect with debugger
+/// The duration between calls to the adcBufCallback
+/// function.
+volatile uint64_t periodNs;   // inspect with debugger
+#endif
+
+/*--------------------------------------------------------*
+ *                    Local Functions                     *
+ *--------------------------------------------------------*/
+
 /*
  * This function is called whenever a buffer is full.
  * The content of the buffer is then converted into human-readable format and
@@ -65,6 +94,10 @@ static Event_Handle adcEvents;
  *
  */
 static void adcBufCallback(ADCBuf_Handle handle, ADCBuf_Conversion *conversion, void *completedADCBuffer, uint32_t completedChannel) {
+#ifdef ENABLE_TIMING_MEASUREMENTS
+    TimestampNow(&start);
+#endif
+
     uint_fast16_t i, sampleCount;
     if (samplesCountdown <= ADCBUFFERSIZE) {
         ADCBuf_convertCancel(handle);
@@ -87,6 +120,13 @@ static void adcBufCallback(ADCBuf_Handle handle, ADCBuf_Conversion *conversion, 
     if (samplesCountdown == 0) {
         Event_post(adcEvents, EVENT_SAMPLING_FINISHED);
     }
+
+#ifdef ENABLE_TIMING_MEASUREMENTS
+    TimestampNow(&end);
+    TimestampDiffNs(&durationNs, &start, &end);
+    TimestampDiffNs(&periodNs, &lastStart, &start);
+    lastStart = start;
+#endif
 }
 
 static uint64_t sampleSum;
