@@ -334,6 +334,7 @@ char *uartreadline()
     return uartlinebuf;
 }
 
+#ifndef DISABLE_DEBUG_PRINT
 /**
  * Printf to UART and JTAG
  *
@@ -351,6 +352,7 @@ void debugprintf(const char *format, ...)
 
     va_end(args);
 }
+#endif
 
 void setPin(PIN_Id pin, uint_t value)
 {
@@ -518,11 +520,13 @@ void uarthexdump(uint8_t *data, size_t size)
     }
 }
 
+#ifndef DISABLE_DEBUG_PRINT
 void debughexdump(uint8_t *data, size_t size)
 {
     hexdump(data, size);
     uarthexdump(data, size);
 }
+#endif
 
 inline void hardreset() {
     SysCtrlSystemReset();
