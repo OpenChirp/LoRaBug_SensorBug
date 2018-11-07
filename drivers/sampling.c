@@ -44,6 +44,9 @@ uint32_t int_sqrt64(uint64_t x) // 780 µs
     return res;
 }
 
+static ADCBuf_Handle adcBuf;
+static ADCBuf_Params adcBufParams;
+static ADCBuf_Conversion continuousConversion;
 static uint16_t sampleBufferOne[ADCBUFFERSIZE];
 static uint16_t sampleBufferTwo[ADCBUFFERSIZE];
 static uint32_t microVoltBuffer[ADCBUFFERSIZE];
@@ -109,13 +112,8 @@ static void sumReduce(uint32_t microVoltReading) {
 
 /**
  *
- * @return The RMS in millivolts
  */
-uint32_t sampleNoise() {
-    ADCBuf_Handle adcBuf;
-    ADCBuf_Params adcBufParams;
-    ADCBuf_Conversion continuousConversion;
-
+void sampleNoiseStart() {
     debugprintf("Sampling Noise\r\n");
 
     Event_construct(&adcEventsStruct, NULL);
@@ -159,6 +157,13 @@ uint32_t sampleNoise() {
     if (ADCBuf_convert(adcBuf, &continuousConversion, 1) != ADCBuf_STATUS_SUCCESS) {
         System_abort("Did not start conversion process correctly\n");
     }
+}
+
+/**
+ *
+ * @return The RMS in millivolts
+ */
+uint32_t sampleNoiseWaitResult() {
     Event_pend(adcEvents, Event_Id_NONE, EVENT_SAMPLING_FINISHED, BIOS_WAIT_FOREVER);
     uint32_t avg =  sampleSum / MIC_SAMPLING_COUNT;
     uint32_t newavg = (lastMICAvg + avg) / 2;
@@ -203,11 +208,7 @@ uint32_t microVoltsToMilliLux(uint32_t uV) {
 /**
  * Should take 1/5kHz * 50 samples = 10ms duration
  */
-uint32_t sampleLight() {
-    ADCBuf_Handle adcBuf;
-    ADCBuf_Params adcBufParams;
-    ADCBuf_Conversion continuousConversion;
-
+void sampleLightStart() {
     debugprintf("Sampling Light\r\n");
 
     Event_construct(&adcEventsStruct, NULL);
@@ -248,6 +249,12 @@ uint32_t sampleLight() {
     if (ADCBuf_convert(adcBuf, &continuousConversion, 1) != ADCBuf_STATUS_SUCCESS) {
         System_abort("Did not start conversion process correctly\n");
     }
+}
+
+/**
+ * @return The average in millilux
+ */
+uint32_t sampleLightWaitResult() {
     Event_pend(adcEvents, Event_Id_NONE, EVENT_SAMPLING_FINISHED, BIOS_WAIT_FOREVER);
     uint64_t avg =  sampleSum / LIGHT_SAMPLING_COUNT;
 

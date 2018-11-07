@@ -341,11 +341,13 @@ static void PrepareTxFrame( uint8_t port )
             // Wait for MIC and Light sensor to stabilize
             Task_sleep(MYMAX(MIC_STABILIZE_TIME_US, LIGHT_STABILIZE_TIME_US) / Clock_tickPeriod);
             if (Settings.light_enabled) {
-                luxLevel = sampleLight();
+                sampleLightStart();
+                luxLevel = sampleLightWaitResult();
             }
             // MIC takes a while to stabilize, whereas the light sensor is ready within 90us
             if (Settings.mic_enabled) {
-                noiseLevel = sampleNoise();
+                sampleNoiseStart();
+                noiseLevel = sampleNoiseWaitResult();
             }
             // Disable Light/MIC Power
             setPin(DOMAIN1_EN, DOMAIN1_OFF);
@@ -727,12 +729,14 @@ static void printLorawanCred() {
 #if defined(CALIBRATION_MODE_LIGHT) || defined(CALIBRATION_MODE_NOISE)
 static void lightCalibration() {
     debugprintf("Sampling Light\r\n");
-    uint32_t mlux = sampleLight();
+    sampleLightStart();
+    uint32_t mlux = sampleLightWaitResult();
     debugprintf("# Light = %d mlux = %f lux\r\n", mlux, (float)mlux / 1000.0);
 }
 static void noiseCalibration() {
     debugprintf("Sampling Noise\r\n");
-    uint32_t mv = sampleNoise();
+    sampleNoiseStart();
+    uint32_t mv = sampleNoiseWaitResult();
     debugprintf("# Noise = %d mV = %f V\r\n", mv, (double)mv / 1000.0);
 }
 

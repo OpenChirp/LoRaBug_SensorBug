@@ -29,8 +29,10 @@
 #define DEFAULT_MIC_BIAS        900000
 
 void BoardInitSensors(bool motion_en);
-uint32_t sampleNoise(void);
-uint32_t sampleLight(void);
+void sampleNoiseStart(void);
+uint32_t sampleNoiseWaitResult(void);
+void sampleLightStart(void);
+uint32_t sampleLightWaitResult(void);
 uint32_t getPIR(void);
 struct bme680_field_data *getBME(void);
 uint32_t getBMXInts(void);
