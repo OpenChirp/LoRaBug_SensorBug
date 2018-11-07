@@ -30,6 +30,7 @@
 
 /* Non-RTOS Drivers */
 #include <driverlib/sys_ctrl.h> // SysCtrlSystemReset()
+#include <driverlib/aon_wuc.h>  // AONWUCPowerStatusGet() & AONWUC_JTAG_POWER_ON
 
 #include "io.h"
 
@@ -530,4 +531,8 @@ void debughexdump(uint8_t *data, size_t size)
 
 inline void hardreset() {
     SysCtrlSystemReset();
+}
+
+inline bool isjtagpoweron() {
+    return (AONWUCPowerStatusGet()&AONWUC_JTAG_POWER_ON) != 0;
 }

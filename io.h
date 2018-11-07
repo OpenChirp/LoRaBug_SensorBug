@@ -8,6 +8,7 @@
 #define IO_H_
 
 #include <stdint.h>
+#include <stdbool.h>
 
 /* TI-RTOS Header files */
 #include <ti/drivers/PIN.h>
@@ -72,6 +73,7 @@ void debughexdump(uint8_t *data, size_t size);
 #endif
 
 void hardreset();
+bool isjtagpoweron();
 
 #ifdef __cplusplus
 }
