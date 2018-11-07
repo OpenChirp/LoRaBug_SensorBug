@@ -293,7 +293,7 @@ void uartvprintf(const char *format, va_list args)
     if (uartHandle == NULL) return;
 
     IArg key = GateMutexPri_enter(GateMutexPri_handle(&uartMutexStruct));
-    vsnprintf(uartsbuf, sizeof(uartsbuf), format, args);
+    System_vsnprintf(uartsbuf, sizeof(uartsbuf), format, args);
 
     if (UART_write(uartHandle, uartsbuf, strlen(uartsbuf)) == UART_ERROR)
     {
@@ -347,7 +347,8 @@ void debugprintf(const char *format, ...)
     va_start(args, format);
 
     // Print to JTAG debugger
-    vprintf(format, args);
+    // System_vprintf only consumes about 144 bytes stack space, whereas vprintf consumes 1,300 bytes
+    System_vprintf(format, args);
     // Print to UART console
     uartvprintf(format, args);
 
