@@ -53,7 +53,7 @@ static uint32_t samplesCountdown = 0;
 static Event_Struct adcEventsStruct;
 static Event_Handle adcEvents;
 
-#define MIN(x,y) ( (x < y) ? x : y )
+#define MIN(x,y) ( ((x) < (y)) ? (x) : (y) )
 
 /*
  * This function is called whenever a buffer is full.
