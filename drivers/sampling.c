@@ -201,8 +201,7 @@ uint32_t microVoltsToMilliLux(uint32_t uV) {
 
 
 /**
- *
- * @return The average in millilux
+ * Should take 1/5kHz * 50 samples = 10ms duration
  */
 uint32_t sampleLight() {
     ADCBuf_Handle adcBuf;
@@ -218,8 +217,8 @@ uint32_t sampleLight() {
     ADCBufCC26XX_ParamsExtension adcCustomParams = {
         .inputScalingEnabled = true,
         .refSource = ADCBufCC26XX_FIXED_REFERENCE,
-        .samplingMode = ADCBufCC26XX_SAMPING_MODE_SYNCHRONOUS,
-        .samplingDuration = ADCBufCC26XX_SAMPLING_DURATION_5P3_US,
+        .samplingMode = ADCBufCC26XX_SAMPING_MODE_ASYNCHRONOUS,
+//        .samplingDuration = ADCBufCC26XX_SAMPLING_DURATION_42P6_US,
     };
 
     ADCBuf_Params_init(&adcBufParams);
@@ -236,7 +235,7 @@ uint32_t sampleLight() {
     continuousConversion.adcChannel = ADC_INDEX_LUX;
     continuousConversion.sampleBuffer = sampleBufferOne;
     continuousConversion.sampleBufferTwo = sampleBufferTwo;
-    continuousConversion.samplesRequestedCount = ADCBUFFERSIZE;
+    continuousConversion.samplesRequestedCount = LIGHT_SAMPLING_COUNT<ADCBUFFERSIZE?LIGHT_SAMPLING_COUNT:ADCBUFFERSIZE;
 
     if (!adcBuf){
         System_abort("adcBuf did not open correctly\n");

@@ -15,7 +15,7 @@
 #define MIC_SAMPLING_FREQ       (2*20*1000)                   // 20kHz * 2
 #define MIC_SAMPLING_COUNT      ((MIC_SAMPLING_FREQ/1000) * MIC_SAMPLING_RUNTIME_MS) // Number of total samples to span SAMPLING_RUNTIME_MS
 #define LIGHT_SAMPLING_FREQ     5000                          // 5kHz
-#define LIGHT_SAMPLING_COUNT    500                           // 500
+#define LIGHT_SAMPLING_COUNT    50                            // 50
 
 #define MIC_STABILIZE_TIME_US   200000                        // The time required for the MIC output to stabilize
 #define LIGHT_STABILIZE_TIME_US 90                            // The time required for the light sensor to stabilize
