@@ -779,8 +779,10 @@ void maintask(UArg arg0, UArg arg1)
     debugprintf("# Board initialized\n");
     printLorawanCred();
 
+#ifdef ENABLE_BLE_ADVERTISEMENT
     // Set the DevEUI and AppKey in the BLE payload
     ble_set_eui_payload(DevEui, AppKey);
+#endif
 
 #if defined(CALIBRATION_MODE_LIGHT) || defined(CALIBRATION_MODE_NOISE)
     calibrationMode();
