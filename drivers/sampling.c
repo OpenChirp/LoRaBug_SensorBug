@@ -184,15 +184,18 @@ uint32_t microVoltsToMilliLux(uint32_t uV) {
  *                  Interface Functions                   *
  *--------------------------------------------------------*/
 
+void sampleInit() {
+    Event_construct(&adcEventsStruct, NULL);
+    adcEvents = Event_handle(&adcEventsStruct);
+}
+
+
 /**
  * This starts the microphone sampling routine process.
  * This cannot be run concurrently with the light samping routine.
  */
 void sampleNoiseStart() {
     debugprintf("Sampling Noise\r\n");
-
-    Event_construct(&adcEventsStruct, NULL);
-    adcEvents = Event_handle(&adcEventsStruct);
 
     /* Set up an ADCBuf peripheral in ADCBuf_RECURRENCE_MODE_CONTINUOUS */
     ADCBufCC26XX_ParamsExtension adcCustomParams = {
@@ -254,7 +257,6 @@ uint32_t sampleNoiseWaitResult() {
     debugprintf("MIC STDDEV = %d\n", stddev);
 
     ADCBuf_close(adcBuf);
-    Event_destruct(&adcEventsStruct);
 
     return stddev / 1000;
 }
@@ -265,9 +267,6 @@ uint32_t sampleNoiseWaitResult() {
  */
 void sampleLightStart() {
     debugprintf("Sampling Light\r\n");
-
-    Event_construct(&adcEventsStruct, NULL);
-    adcEvents = Event_handle(&adcEventsStruct);
 
     /* Set up an ADCBuf peripheral in ADCBuf_RECURRENCE_MODE_CONTINUOUS */
     ADCBufCC26XX_ParamsExtension adcCustomParams = {
@@ -324,7 +323,6 @@ uint32_t sampleLightWaitResult() {
     debugprintf("Light AVG = %llu = %f V\n", avg, ((double)avg)/1000.0/1000.0);
 
     ADCBuf_close(adcBuf);
-    Event_destruct(&adcEventsStruct);
 
     return microVoltsToMilliLux(avg);
 }

@@ -37,7 +37,6 @@ static const PIN_Config pinTable[] = {
 };
 
 static void SensorIntHandler(PIN_Handle handle, PIN_Id pinId) {
-
     if (pinId == PIR_OUT && pirCount < UINT32_MAX)
         pirCount++;
 
@@ -45,8 +44,12 @@ static void SensorIntHandler(PIN_Handle handle, PIN_Id pinId) {
         bmxCount++;
 }
 
-void BoardInitSensors(bool motion_en) {
+/**
+ * Defined in sampling.c.
+ */
+void sampleInit(void);
 
+void BoardInitSensors(bool motion_en) {
     // Adds PIR Interrupt Callback
     PinHandle = PIN_open(&PinState, pinTable);
     if (!PinHandle) {
@@ -60,6 +63,7 @@ void BoardInitSensors(bool motion_en) {
         setupBMI(true);  // Initialize the Accelerometer in Low-Power mode with Interrupts
     }
     initBMM();           // Initialize the Magnetometer in Suspend-Modestruct bmi160_int_settg int_config;
+    sampleInit();
 
 }
 
