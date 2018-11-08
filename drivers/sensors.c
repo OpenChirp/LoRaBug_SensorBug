@@ -16,6 +16,7 @@
 
 #include <PERIPHERALS.h>
 #include <io.h>
+#include <error.h>
 
 #include "i2c.h"
 #include "bme680.h"
