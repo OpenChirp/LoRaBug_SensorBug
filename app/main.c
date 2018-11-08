@@ -98,6 +98,18 @@ const uint32_t software_ver_minor = 1;
 #define DEFAULT_LIGHT_ENABLED  true
 #define DEFAULT_MIC_ENABLED    true
 
+/**
+ * When defined, the button will trigger a reset one second after being pressed.
+ * If button is still depressed when the device begins to boot, the bootloader
+ * will be triggered.
+ *
+ * When undefined, the button triggers the lorawan credentials printing and broadcasting.
+ * In other words, when you press the button the lorawan credentials are printed to
+ * UART+JTAG and broadcasted over BLE (if enabled).
+ * If the button is still depressed after 1sec a reset is triggered, which
+ * will ultimately catch the bootlader on startup.
+ *
+ */
 #define BUTTON_AS_RESET
 
 /**@def WATCHDOG_ENABLED
@@ -316,7 +328,6 @@ static void PrepareTxFrame( uint8_t port )
     uint32_t noiseLevel = 0;
     uint32_t luxLevel = 0;
     struct bme680_field_data *bmeData;
-
     pb_ostream_t stream;
 
     debugprintf("# PrepareTxFrame\n");
@@ -948,7 +959,7 @@ void maintask(UArg arg0, UArg arg1)
                     hardreset();
                 }
 #else
-                // Will reset in 1 sec -- hold button to trigger bootload on boot
+                // Will reset in 1 sec -- hold button to trigger bootloader on boot
                 Task_sleep(TIME_MS * 1000);
                 hardreset();
 #endif
