@@ -44,6 +44,12 @@ void enableLeds();
 void disableLeds();
 void setLed(PIN_Id pin, uint_t value);
 void toggleLed(PIN_Id pin);
+/**
+ * Turn on the onboard led for a fixed amount of time
+ * @param pin Board_GLED or Board_RLED
+ * @param ms The timeout in milliseconds
+ */
+void timedLed(PIN_Id pin, unsigned ms);
 
 int getButtonState();
 void setBtnCallback(void (*callback)(void));

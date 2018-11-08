@@ -56,6 +56,10 @@ static PIN_Handle uartSensePinHandle;
 static Clock_Struct buttonClock;
 static Clock_Handle hButtonClock;
 
+/* Clock used for LED timeout logic */
+static Clock_Struct gLedClock;
+static Clock_Struct rLedClock;
+
 /* UART driver handle */
 static UART_Handle uartHandle = NULL;
 
@@ -107,7 +111,7 @@ static const PIN_Config uartSensePinTable[] = {
 /*!*****************************************************************************
  *  @brief      Button clock callback
  *
- *  Called when the debounce periode is over. Stopping the clock, toggling
+ *  Called when the debounce period is over. Stopping the clock, toggling
  *  the device mode based on activeButtonPinId:
  *
  *  Reenabling the interrupts and resetting the activeButtonPinId.
@@ -163,6 +167,26 @@ static void btnIntCallback(PIN_Handle handle, PIN_Id pinId)
     Clock_start(hButtonClock);
 }
 
+/*!*****************************************************************************
+ *  @brief      LED Timeout callback
+ *
+ *  Called when the LED timeout period has expired. The LED is assumed to still
+ *  be on and should now be turned off.
+ *
+ *  Default action is to turn off the specified LED.
+ *
+ *  @param      arg  argument (PIN_Handle) connected to the callback
+ *
+ ******************************************************************************/
+static void ledTimeoutCb(UArg arg) {
+    PIN_Id pin = (PIN_Id) arg;
+
+    if (PIN_setOutputValue(ledPinHandle, pin, 0) != PIN_SUCCESS)
+    {
+        System_abort("Failed to set LED value\n");
+    }
+}
+
 void setuppins()
 {
     ledPinHandle = PIN_open(&ledPinState, ledPinTable);
@@ -187,6 +211,15 @@ void setuppins()
     clockParams.arg = (UArg) btnPinHandle;
     Clock_construct(&buttonClock, buttonClockCb, 0, &clockParams);
     hButtonClock = Clock_handle(&buttonClock);
+
+    /* Contruct clocks for Led timeouts */
+    Clock_Params_init(&clockParams);
+    clockParams.arg = (UArg) Board_GLED;
+    Clock_construct(&gLedClock, ledTimeoutCb, 0, &clockParams);
+    Clock_Params_init(&clockParams);
+    clockParams.arg = (UArg) Board_RLED;
+    Clock_construct(&rLedClock, ledTimeoutCb, 0, &clockParams);
+
 
     /* Register Callback for Button Interrupt */
     if (PIN_registerIntCb(btnPinHandle, btnIntCallback) != PIN_SUCCESS)
@@ -398,6 +431,31 @@ void toggleLed(PIN_Id pin)
     {
         System_abort("Failed to toggle pin value\n");
     }
+}
+
+void timedLed(PIN_Id pin, unsigned ms) {
+    Clock_Handle clk;
+
+    if (!ledsEnabled) {
+        return;
+    }
+
+    switch (pin) {
+    case Board_GLED:
+        clk = Clock_handle(&gLedClock);
+        break;
+    case Board_RLED:
+        clk = Clock_handle(&rLedClock);
+        break;
+    default:
+        System_abort("timedLed given bad pin\n");
+    }
+
+    setLed(pin, 1);
+
+    Clock_stop(clk);
+    Clock_setTimeout(clk, (UInt32)(ms*1000 / Clock_tickPeriod));
+    Clock_start(clk);
 }
 
 int getButtonState()
