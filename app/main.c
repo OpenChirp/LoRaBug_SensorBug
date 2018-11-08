@@ -65,6 +65,9 @@ const uint32_t software_ver_minor = 1;
 /*                     Configuration                                      */
 /*------------------------------------------------------------------------*/
 
+/**@def LED_ONTIME_MS
+ * The timeout period for the red led to be visible by a human
+ */
 #define LED_ONTIME_MS                               100
 
 /**@def USE_BOARD_UNIQUE_ID_DEV_EUI
@@ -230,16 +233,6 @@ static uint32_t TxDutyCycleTime;
  * Timer to handle the application data transmission duty cycle
  */
 static TimerEvent_t TxNextPacketTimer;
-
-/*!
- * Timer to handle the state of LED1
- */
-static TimerEvent_t Led1Timer;
-
-/*!
- * Timer to handle the state of LED2
- */
-static TimerEvent_t Led2Timer;
 
 /*!
  * Indicates if a new packet can be sent
@@ -515,31 +508,10 @@ static void OnTxNextPacketTimerEvent( void )
             SendOnJoin = true;
         }
     }
-    setLed(Board_RLED, 1);
-    TimerStart( &Led2Timer );
+    timedLed(Board_RLED, LED_ONTIME_MS);
 
     setLed(Board_GLED, 1); // denote busy - turned off on send confirm
     Event_post(runtimeEvents, EVENT_STATECHANGE);
-}
-
-/*!
- * \brief Function executed on Led 1 Timeout event
- */
-static void OnLed1TimerEvent( void )
-{
-    TimerStop( &Led1Timer );
-    // Switch LED 1 OFF
-    setLed(Board_GLED, 0);
-}
-
-/*!
- * \brief Function executed on Led 2 Timeout event
- */
-static void OnLed2TimerEvent( void )
-{
-    TimerStop( &Led2Timer );
-    // Switch LED 2 OFF
-    setLed(Board_RLED, 0);
 }
 
 /*!
@@ -671,8 +643,7 @@ static void McpsIndication( McpsIndication_t *mcpsIndication )
     }
 
     // Switch LED 2 ON for each received downlink
-    setLed(Board_RLED, 1);
-    TimerStart( &Led2Timer );
+    timedLed(Board_RLED, LED_ONTIME_MS);
     Event_post(runtimeEvents, EVENT_STATECHANGE);
 }
 
@@ -707,8 +678,7 @@ static void MlmeConfirm( MlmeConfirm_t *mlmeConfirm )
                 debugprintf("# MlmeConfirm: Join Failed\n");
                 DeviceState = DEVICE_STATE_JOIN;
 
-                setLed(Board_RLED, 1);
-                TimerStart( &Led2Timer );
+                timedLed(Board_RLED, LED_ONTIME_MS);
             }
             break;
         }
@@ -762,7 +732,7 @@ static void calibrationMode() {
     // This allows for one press programming using the bootloader.
     setBtnCallback(NULL);
     // Turn on the red LED to indicate we are in calibration mode
-    setLed(Board_RLED, 1);
+//    setLed(Board_RLED, 1);
     // Turn on power to the MIC and Light sensor
     setPin(DOMAIN1_EN, DOMAIN1_ON);
     // Wait for MIC and Light sensor to stabilize
@@ -830,12 +800,6 @@ void maintask(UArg arg0, UArg arg1)
                 TimerInit( &TxNextPacketTimer, OnTxNextPacketTimerEvent );
                 // Listen for button press to trigger next packet instead of timer
                 setBtnCallback(ButtonCallback);
-
-                TimerInit( &Led1Timer, OnLed1TimerEvent );
-                TimerSetValue( &Led1Timer, LED_ONTIME_MS );
-
-                TimerInit( &Led2Timer, OnLed2TimerEvent );
-                TimerSetValue( &Led2Timer, LED_ONTIME_MS );
 
                 mibReq.Type = MIB_ADR;
                 mibReq.Param.AdrEnable = LORAWAN_ADR_ON;
@@ -974,8 +938,7 @@ void maintask(UArg arg0, UArg arg1)
                         SendOnJoin = true;
                     }
                 }
-                setLed(Board_RLED, 1);
-                TimerStart( &Led2Timer );
+                timedLed(Board_RLED, LED_ONTIME_MS);
 
                 setLed(Board_GLED, 1); // denote busy - turned off on send confirm
 
