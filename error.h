@@ -12,6 +12,8 @@
 #include <xdc/runtime/Types.h>
 #include <xdc/runtime/Timestamp.h>
 
+#include "io.h"
+
 #include <stdbool.h>
 
 /*--------------------------------------------------------*
@@ -34,16 +36,12 @@ bool TimestampDiffNs(uint64_t *nanoseconds, Types_Timestamp64 *before, Types_Tim
 
 #ifndef DISABLE_DEBUG_PRINT
 
-/**
- * Printf to UART and JTAG
- */
-void debugprintf(const char *format, ...)
-        __attribute__ ((format (printf, 1, 2)));
-void debughexdump(uint8_t *data, size_t size);
+#define debugprintf(fmt, args...) allprintf(fmt, ## args)
+#define debughexdump(data, size)  allhexdump(data, size)
 
 #else
 
-#define debugprintf(fmt, ...) do { } while(0)
+#define debugprintf(fmt, ...)    do { } while(0)
 #define debughexdump(data, size) do { } while(0)
 
 #endif

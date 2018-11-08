@@ -501,6 +501,34 @@ void uarthexdump(uint8_t *data, size_t size)
     }
 }
 
+
+/**
+ * Printf to UART and JTAG
+ *
+ * @note This CANNOT be used in a Hwi or Swi (pin callbacks included), since this function blocks in uart
+ */
+void allprintf(const char *format, ...)
+{
+    va_list args;
+    va_start(args, format);
+
+    // Print to JTAG debugger
+    // System_vprintf only consumes about 144 bytes stack space, whereas vprintf consumes 1,300 bytes
+    System_vprintf(format, args);
+    System_flush();
+    // Print to UART console
+    uartvprintf(format, args);
+
+    va_end(args);
+}
+
+void allhexdump(uint8_t *data, size_t size)
+{
+    hexdump(data, size);
+    uarthexdump(data, size);
+}
+
+
 inline void hardreset() {
     SysCtrlSystemReset();
 }

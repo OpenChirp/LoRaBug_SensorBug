@@ -100,34 +100,3 @@ bool TimestampDiffNs(uint64_t *nanoseconds, Types_Timestamp64 *before, Types_Tim
     *nanoseconds = ((after64-before64) * 1e9) / freq64;
     return true;
 }
-
-
-#ifndef DISABLE_DEBUG_PRINT
-
-/**
- * Printf to UART and JTAG
- *
- * @note This CANNOT be used in a Hwi or Swi (pin callbacks included), since this function blocks in uart
- */
-void debugprintf(const char *format, ...)
-{
-    va_list args;
-    va_start(args, format);
-
-    // Print to JTAG debugger
-    // System_vprintf only consumes about 144 bytes stack space, whereas vprintf consumes 1,300 bytes
-    System_vprintf(format, args);
-    System_flush();
-    // Print to UART console
-    uartvprintf(format, args);
-
-    va_end(args);
-}
-
-void debughexdump(uint8_t *data, size_t size)
-{
-    hexdump(data, size);
-    uarthexdump(data, size);
-}
-
-#endif

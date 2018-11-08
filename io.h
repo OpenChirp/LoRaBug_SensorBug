@@ -51,6 +51,13 @@ void setBtnCallback(void (*callback)(void));
 void hexdump(uint8_t *data, size_t size);
 void uarthexdump(uint8_t *data, size_t size);
 
+/**
+ * Printf to UART and JTAG
+ */
+void allprintf(const char *format, ...)
+        __attribute__ ((format (printf, 1, 2)));
+void allhexdump(uint8_t *data, size_t size);
+
 void hardreset();
 bool isjtagpoweron();
 
