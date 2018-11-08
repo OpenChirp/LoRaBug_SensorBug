@@ -10,7 +10,7 @@
 #include <ti/drivers/ADC.h>
 
 /* BIOS Header files */
-#include <ti/sysbios/hal/Hwi.h>
+#include <ti/sysbios/knl/Swi.h>
 
 #include <stdint.h>
 
@@ -68,18 +68,18 @@ void BoardInitSensors(bool motion_en) {
 }
 
 uint32_t getPIR(void) {
-    UInt key = Hwi_disable();
+    UInt key = Swi_disable();
     uint32_t tmp = pirCount;
     pirCount = 0;
-    Hwi_restore(key);
+    Swi_restore(key);
     return tmp;
 }
 
 uint32_t getBMXInts(void) {
-    UInt key = Hwi_disable();
+    UInt key = Swi_disable();
     uint32_t tmp = bmxCount;
     bmxCount = 0;
-    Hwi_restore(key);
+    Swi_restore(key);
     return tmp;
 }
 
