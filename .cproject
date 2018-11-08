@@ -49,7 +49,7 @@
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}}"/>
 									<listOptionValue builtIn="false" value="${COM_TI_RTSC_TIRTOSCC13XX_CC26XX_INSTALL_DIR}/products/cc26xxware_2_24_03_17272"/>
 									<listOptionValue builtIn="false" value="${CG_TOOL_ROOT}/include"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/lorabuglib}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/lorabugsys}&quot;"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/loramac/src/radio}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/loramac/src/system/crypto}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/loramac/src/boards/LoRaBug}"/>
@@ -111,7 +111,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="builds|easybits/nanopb|loramac/src/system/gps.c|loramac/src/boards/NAMote72|loramac/src/system/timer.c|loramac/Keil|loramac/coIDE|src|loramac/Doc|loramac/src/system/eeprom.c|loramac/src/system/uart.c|loramac/src/system/delay.c|loramac/src/apps|loramac/src/boards/MoteII|loramac/src/boards/mcu|loramac/src/boards/SK-iM880A|loramac/src/radio/sx1272|loramac/src/system/gpio.c|loramac/src/system/adc.c|loramac/src/peripherals|loramac/src/boards/SensorNode|loramac/src/system/i2c.c|loramac/src/system/fifo.c|loramac/src/boards/LoRaMote" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="loramac/src/system/gps.c|loramac/src/boards/NAMote72|loramac/src/system/timer.c|easybits/nanopb|loramac/Keil|loramac/coIDE|src|builds|loramac/Doc|loramac/src/system/eeprom.c|loramac/src/system/uart.c|loramac/src/system/delay.c|loramac/src/apps|loramac/src/boards/MoteII|loramac/src/boards/mcu|loramac/src/boards/SK-iM880A|loramac/src/radio/sx1272|loramac/src/system/gpio.c|loramac/src/system/adc.c|loramac/src/peripherals|loramac/src/boards/SensorNode|loramac/src/system/i2c.c|loramac/src/system/fifo.c|loramac/src/boards/LoRaMote" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -164,7 +164,7 @@
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}}"/>
 									<listOptionValue builtIn="false" value="${COM_TI_RTSC_TIRTOSCC13XX_CC26XX_INSTALL_DIR}/products/cc26xxware_2_24_03_17272"/>
 									<listOptionValue builtIn="false" value="${CG_TOOL_ROOT}/include"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/lorabuglib}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/lorabugsys}&quot;"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/loramac/src/radio}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/loramac/src/system/crypto}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/loramac/src/boards/LoRaBug}"/>
@@ -226,7 +226,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="rtos.cfg|loramac/src/peripherals|loramac/src/radio/sx1272|loramac/src/system/uart.c|loramac/src/system/timer.c|loramac/src/system/i2c.c|loramac/src/system/gps.c|loramac/src/system/gpio.c|loramac/src/system/fifo.c|loramac/src/system/eeprom.c|loramac/src/system/delay.c|loramac/src/system/adc.c|loramac/Keil|loramac/Doc|loramac/coIDE|loramac/src/apps|loramac/src/boards/SK-iM880A|loramac/src/boards/SensorNode|loramac/src/boards/NAMote72|loramac/src/boards/MoteII|loramac/src/boards/mcu|loramac/src/boards/LoRaMote|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="loramac/src/system/gps.c|loramac/src/boards/NAMote72|loramac/src/system/timer.c|rtos.cfg|loramac/Keil|loramac/coIDE|src|loramac/Doc|loramac/src/system/eeprom.c|loramac/src/system/uart.c|loramac/src/system/delay.c|loramac/src/apps|loramac/src/boards/MoteII|loramac/src/boards/mcu|loramac/src/boards/SK-iM880A|loramac/src/radio/sx1272|loramac/src/peripherals|loramac/src/system/gpio.c|loramac/src/system/adc.c|loramac/src/boards/SensorNode|loramac/src/system/i2c.c|loramac/src/system/fifo.c|loramac/src/boards/LoRaMote" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
