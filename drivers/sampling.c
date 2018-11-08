@@ -185,7 +185,8 @@ uint32_t microVoltsToMilliLux(uint32_t uV) {
  *--------------------------------------------------------*/
 
 /**
- *
+ * This starts the microphone sampling routine process.
+ * This cannot be run concurrently with the light samping routine.
  */
 void sampleNoiseStart() {
     debugprintf("Sampling Noise\r\n");
@@ -278,7 +279,11 @@ void sampleLightStart() {
 
     ADCBuf_Params_init(&adcBufParams);
     adcBufParams.callbackFxn = adcBufCallback;
-    adcBufParams.recurrenceMode = ADCBuf_RECURRENCE_MODE_CONTINUOUS;
+    if (LIGHT_SAMPLING_COUNT <= ADCBUFFERSIZE) {
+        adcBufParams.recurrenceMode = ADCBuf_RECURRENCE_MODE_ONE_SHOT;
+    } else {
+        adcBufParams.recurrenceMode = ADCBuf_RECURRENCE_MODE_CONTINUOUS;
+    }
     adcBufParams.returnMode = ADCBuf_RETURN_MODE_CALLBACK;
     adcBufParams.samplingFrequency = LIGHT_SAMPLING_FREQ;
     adcBufParams.custom = &adcCustomParams;
@@ -290,7 +295,11 @@ void sampleLightStart() {
     continuousConversion.adcChannel = ADC_INDEX_LUX;
     continuousConversion.sampleBuffer = sampleBufferOne;
     continuousConversion.sampleBufferTwo = sampleBufferTwo;
-    continuousConversion.samplesRequestedCount = LIGHT_SAMPLING_COUNT<ADCBUFFERSIZE?LIGHT_SAMPLING_COUNT:ADCBUFFERSIZE;
+    if (LIGHT_SAMPLING_COUNT < ADCBUFFERSIZE) {
+        continuousConversion.samplesRequestedCount = LIGHT_SAMPLING_COUNT;
+    } else {
+        continuousConversion.samplesRequestedCount = ADCBUFFERSIZE;
+    }
 
     if (!adcBuf){
         System_abort("adcBuf did not open correctly\n");

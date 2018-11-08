@@ -10,6 +10,17 @@
 #ifndef __SENSORS_H__
 #define __SENSORS_H__
 
+/**
+ * MIC sampling is currently configured to sample at 40kHz for 500ms.
+ * Since the ADCBUFFERSIZE if 100 elements, the reducing callback has 2.5ms
+ * to complete.
+ * Currently, the reduction callback take about 518us to complete, which is
+ * within the 2.5ms possible.
+ *
+ * Light sampling is currently configured to sample at 5kHz for 10ms.
+ * Since this requires only 50 samples, we configure the adcbuf collection
+ * to use 50 of the 100 element buffer in a one shot configuration.
+ */
 #define ADCBUFFERSIZE           100
 #define MIC_SAMPLING_RUNTIME_MS 500                           // 500ms
 #define MIC_SAMPLING_FREQ       (2*20*1000)                   // 20kHz * 2
