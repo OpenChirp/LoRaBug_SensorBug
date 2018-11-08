@@ -31,8 +31,8 @@
 #include <pb_decode.h>
 #include <pb_encode.h>
 #include <sensorbug.pb.h>
-#include "io.h"
-#include "error.h"
+#include <io.h>
+#include <error.h>
 
 /* LoRa Radio Header files */
 #include "board.h" // The LoRaMac-node/src/boads/LoRaBug/board.h file

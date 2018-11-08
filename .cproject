@@ -49,6 +49,7 @@
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}}"/>
 									<listOptionValue builtIn="false" value="${COM_TI_RTSC_TIRTOSCC13XX_CC26XX_INSTALL_DIR}/products/cc26xxware_2_24_03_17272"/>
 									<listOptionValue builtIn="false" value="${CG_TOOL_ROOT}/include"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/lorabuglib}&quot;"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/loramac/src/radio}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/loramac/src/system/crypto}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/loramac/src/boards/LoRaBug}"/>
@@ -163,6 +164,7 @@
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}}"/>
 									<listOptionValue builtIn="false" value="${COM_TI_RTSC_TIRTOSCC13XX_CC26XX_INSTALL_DIR}/products/cc26xxware_2_24_03_17272"/>
 									<listOptionValue builtIn="false" value="${CG_TOOL_ROOT}/include"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/lorabuglib}&quot;"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/loramac/src/radio}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/loramac/src/system/crypto}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/loramac/src/boards/LoRaBug}"/>
