@@ -29,6 +29,10 @@ void setupuart();
  *                  Interface Functions                   *
  *--------------------------------------------------------*/
 
+/* Utiities */
+
+void hardreset(void);
+
 /* uart.c */
 bool uart_isopen(void);
 void uart_write(const char *str, size_t size);
@@ -73,8 +77,6 @@ void uarthexdump(uint8_t *data, size_t size);
 void allprintf(const char *format, ...)
         __attribute__ ((format (printf, 1, 2)));
 void allhexdump(uint8_t *data, size_t size);
-
-void hardreset(void);
 
 #ifdef __cplusplus
 }
