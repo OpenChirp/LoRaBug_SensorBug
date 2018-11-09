@@ -236,8 +236,8 @@ void uart_vprintf(const char *format, va_list args)
 
     IArg key = GateMutexPri_enter(GateMutexPri_handle(&uartWriteMutexStruct));
 
-    System_vsnprintf(writebuf, sizeof(writebuf), format, args);
     Semaphore_pend(Semaphore_handle(&uartWriteSemStruct), BIOS_WAIT_FOREVER);
+    System_vsnprintf(writebuf, sizeof(writebuf), format, args);
     if (UART_write(uartHandle, writebuf, strlen(writebuf)) == UART_ERROR)
     {
         System_abort("Failed to write formatted buffer to uart\n");
