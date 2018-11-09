@@ -31,10 +31,15 @@ static UART_Handle uartHandle = NULL;
 
 static GateMutexPri_Struct uartMutexStruct;
 
+/*--------------------------------------------------------*
+ *                    Configuration                       *
+ *--------------------------------------------------------*/
 
-/* Settings */
+#define UART_BAUD               115200
+//#define UART_BAUD               3000000
 #define UART_PRINTF_BUFFER_SIZE 128 // Should be a minimum of 5+17 for uarthexdump
-#define UART_RECV_LINE_LENGTH 768
+#define UART_RECV_LINE_LENGTH   768
+
 
 // Buffer for snprintf and uart_write
 static char uartsbuf[UART_PRINTF_BUFFER_SIZE];
@@ -44,10 +49,6 @@ static const PIN_Config uartSensePinTable[] = {
         Board_UART_RX | PIN_INPUT_EN | PIN_NOPULL | PIN_HYSTERESIS | PIN_IRQ_POSEDGE,
         PIN_TERMINATE
 };
-
-bool uart_isopen() {
-    return uartHandle != NULL;
-}
 
 /**
  * @note This routine should not race with the uartsetup function because the interrupt
@@ -63,7 +64,7 @@ static void uart_open()
 
         UART_Params uartParams;
         UART_Params_init(&uartParams);
-        uartParams.baudRate = 115200; // 3000000
+        uartParams.baudRate = UART_BAUD;
         uartParams.readMode = UART_MODE_BLOCKING;
         uartParams.writeMode = UART_MODE_BLOCKING;
         // UARTCC26xx does not implement any of these parameters
@@ -87,6 +88,14 @@ static void uart_open()
 static void uartRxIntCallback(PIN_Handle handle, PIN_Id pinId)
 {
     uart_open();
+}
+
+/*--------------------------------------------------------*
+ *                  Interface Functions                   *
+ *--------------------------------------------------------*/
+
+bool uart_isopen() {
+    return uartHandle != NULL;
 }
 
 void setupuart()
