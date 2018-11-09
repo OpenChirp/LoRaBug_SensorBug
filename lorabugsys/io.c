@@ -312,7 +312,10 @@ void setBtnCallback(void (*callback)(void))
 
 /* Utilities */
 
-void hexdump(uint8_t *data, size_t size)
+typedef void printf_t(const char *format, ...)
+__attribute__ ((format (printf, 1, 2)));
+
+static void _hexdump(printf_t prnf, uint8_t *data, size_t size)
 {
     // Stolen from https://gist.github.com/ccbrown/9722406
     char ascii[17];
@@ -320,7 +323,7 @@ void hexdump(uint8_t *data, size_t size)
     ascii[16] = '\0';
     for (i = 0; i < size; ++i)
     {
-        printf("%02X ", ((unsigned char*) data)[i]);
+        prnf("%02X ", ((unsigned char*) data)[i]);
         if (((unsigned char*) data)[i] >= ' '
                 && ((unsigned char*) data)[i] <= '~')
         {
@@ -332,73 +335,36 @@ void hexdump(uint8_t *data, size_t size)
         }
         if ((i + 1) % 8 == 0 || i + 1 == size)
         {
-            printf(" ");
+            prnf(" ");
             if ((i + 1) % 16 == 0)
             {
-                printf("|  %s \n", ascii);
+                prnf("|  %s \n", ascii);
             }
             else if (i + 1 == size)
             {
                 ascii[(i + 1) % 16] = '\0';
                 if ((i + 1) % 16 <= 8)
                 {
-                    printf(" ");
+                    prnf(" ");
                 }
                 for (j = (i + 1) % 16; j < 16; ++j)
                 {
-                    printf("   ");
+                    prnf("   ");
                 }
-                printf("|  %s \n", ascii);
+                prnf("|  %s \n", ascii);
             }
         }
     }
 }
 
+void hexdump(uint8_t *data, size_t size)
+{
+    _hexdump(jtag_printf, data, size);
+}
+
 void uarthexdump(uint8_t *data, size_t size)
 {
-    // Stolen from https://gist.github.com/ccbrown/9722406
-    char ascii[17];
-    size_t i, j;
-    ascii[16] = '\0';
-
-    for (i = 0; i < size; ++i)
-    {
-        if ((i % 16) == 0)
-            uartprintf(HEXDUMP_STR_PREFIX);
-        uartprintf("%02X ", ((unsigned char*) data)[i]);
-        if (((unsigned char*) data)[i] >= ' '
-                && ((unsigned char*) data)[i] <= '~')
-        {
-            ascii[i % 16] = ((unsigned char*) data)[i];
-        }
-        else
-        {
-            ascii[i % 16] = '.';
-        }
-        if ((i + 1) % 8 == 0 || i + 1 == size)
-        {
-            uartprintf(" ");
-            if ((i + 1) % 16 == 0)
-            {
-                // done with row
-                uartprintf("|  %s \n", ascii);
-            }
-            else if (i + 1 == size)
-            {
-                // must be done with stream
-                ascii[(i + 1) % 16] = '\0';
-                if ((i + 1) % 16 <= 8)
-                {
-                    uartprintf(" ");
-                }
-                for (j = (i + 1) % 16; j < 16; ++j)
-                {
-                    uartprintf("   ");
-                }
-                uartprintf("|  %s \n", ascii);
-            }
-        }
-    }
+    _hexdump(uart_printf, data, size);
 }
 
 
