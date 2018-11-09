@@ -330,7 +330,7 @@ static void PrepareTxFrame( uint8_t port )
     struct bme680_field_data *bmeData;
     pb_ostream_t stream;
 
-    debugprintf("# PrepareTxFrame\n");
+    debugprintf("# PrepareTxFrame(%u)\n", port);
 
     switch( port )
     {
@@ -458,6 +458,7 @@ static bool SendFrame( void )
     // So, PrepareFrame needs to have already been called.
     if( LoRaMacQueryTxPossible( AppDataSize, &txInfo ) != LORAMAC_STATUS_OK )
     {
+        debugprintf("# --> Send Not Possible!\n");
         // Send empty frame in order to flush MAC commands
         mcpsReq.Type = MCPS_UNCONFIRMED;
         mcpsReq.Req.Unconfirmed.fBuffer = NULL;
@@ -552,6 +553,8 @@ static void McpsConfirm( McpsConfirm_t *mcpsConfirm )
                 // Check AckReceived
                 // Check NbTrials
                 debugprintf("# Got McpsConfirm: MCPS_CONFIRMED\n");
+                debugprintf("# --> AckReceived: %s\n", mcpsConfirm->AckReceived?"Yes":"No");
+                debugprintf("# --> NbTrials: %u\n", mcpsConfirm->NbRetries);
                 break;
             }
             case MCPS_PROPRIETARY:
@@ -891,6 +894,7 @@ void maintask(UArg arg0, UArg arg1)
             case DEVICE_STATE_SEND:
             {
                 debugprintf("# DeviceState: DEVICE_STATE_SEND\n");
+                debugprintf("# --> NextTx = %d\n", NextTx);
                 if( NextTx == true )
                 {
                     PrepareTxFrame( AppPort );
