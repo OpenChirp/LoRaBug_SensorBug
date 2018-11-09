@@ -360,7 +360,7 @@ void phexdump(printf_t prnf, uint8_t *data, size_t size)
  * @note This CANNOT be used in a Hwi or Swi (pin callbacks included), since this function blocks in uart
  *
  * @todo This can be optimized to only do the printf style formatting once and then write the buffer to
- *       both outputs.
+ *       both outputs. It will need to be protected from multiple threads entering this routine.
  */
 void allprintf(const char *format, ...)
 {
