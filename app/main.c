@@ -715,6 +715,12 @@ static void ButtonCallback(void) {
     Event_post(runtimeEvents, EVENT_BUTTONPRESSED);
 }
 
+static void UartCallback(const char *buf, size_t len) {
+    if (strcmp(buf, "reset") == 0) {
+        hardreset();
+    }
+}
+
 static void printLorawanCred() {
     // Space after 0x, so that it is easy to copy-paste
     allprintf("# Software Version: %u.%u\n", software_ver_major, software_ver_minor);
@@ -771,6 +777,8 @@ void maintask(UArg arg0, UArg arg1)
 
     Event_construct(&runtimeEventsStruct, NULL);
     runtimeEvents = Event_handle(&runtimeEventsStruct);
+
+    uart_readline_setcallback(UartCallback);
 
     BoardInitMcu( );
     BoardInitPeriph( );
