@@ -50,6 +50,7 @@ void uart_hexdump(uint8_t *data, size_t size);
 
 /* jtag.c */
 bool jtag_ispowered(void);
+void jtag_write(const char *str, size_t size);
 void jtag_vprintf(const char *format, va_list args)
     __attribute__ ((format (printf, 1, 0)));
 void jtag_printf(const char *format, ...)

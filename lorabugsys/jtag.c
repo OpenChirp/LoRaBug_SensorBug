@@ -16,6 +16,14 @@
 inline bool jtag_ispowered() {
     return (AONWUCPowerStatusGet()&AONWUC_JTAG_POWER_ON) != 0;
 }
+void jtag_write(const char *str, size_t size)
+{
+    size_t i;
+    for (i = 0; i < size; i++) {
+        System_putch(str[i]);
+    }
+    System_flush();
+}
 
 void jtag_vprintf(const char *format, va_list args)
 {
