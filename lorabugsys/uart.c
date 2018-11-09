@@ -18,7 +18,9 @@
 #include <ti/drivers/UART.h>
 
 /* BIOS Header files */
+#include <ti/sysbios/BIOS.h>
 #include <ti/sysbios/gates/GateMutexPri.h>
+#include <ti/sysbios/knl/Semaphore.h>
 //#include <ti/sysbios/knl/Clock.h>
 
 #include "io.h"
@@ -29,7 +31,10 @@ static PIN_Handle uartSensePinHandle;
 /* UART driver handle */
 static UART_Handle uartHandle = NULL;
 
-static GateMutexPri_Struct uartMutexStruct;
+// Mutex to protect entry into functions where we use provided buffer
+static GateMutexPri_Struct uartWriteMutexStruct;
+// Semaphore to represent if we can issue another UART_write
+static Semaphore_Struct    uartWriteSemStruct;
 
 /*--------------------------------------------------------*
  *                    Configuration                       *
@@ -37,18 +42,23 @@ static GateMutexPri_Struct uartMutexStruct;
 
 #define UART_BAUD               115200
 //#define UART_BAUD               3000000
-#define UART_PRINTF_BUFFER_SIZE 128 // Should be a minimum of 5+17 for uarthexdump
+#define UART_PRINTF_BUFFER_SIZE 256 // Should be a minimum of 5+17 for uarthexdump
 #define UART_RECV_LINE_LENGTH   768
 
 
 // Buffer for snprintf and uart_write
-static char uartsbuf[UART_PRINTF_BUFFER_SIZE];
+static char uartwritebuf[UART_PRINTF_BUFFER_SIZE];
 static char uartlinebuf[UART_RECV_LINE_LENGTH + 1]; // +1 for '\0'
 
 static const PIN_Config uartSensePinTable[] = {
         Board_UART_RX | PIN_INPUT_EN | PIN_NOPULL | PIN_HYSTERESIS | PIN_IRQ_POSEDGE,
         PIN_TERMINATE
 };
+
+
+static void uartWriteCallback(UART_Handle uart, void *buf, size_t count) {
+    Semaphore_post(Semaphore_handle(&uartWriteSemStruct));
+}
 
 /**
  * @note This routine should not race with the uartsetup function because the interrupt
@@ -66,12 +76,13 @@ static void uartOpen()
         UART_Params_init(&uartParams);
         uartParams.baudRate = UART_BAUD;
         uartParams.readMode = UART_MODE_BLOCKING;
-        uartParams.writeMode = UART_MODE_BLOCKING;
+        uartParams.writeMode = UART_MODE_CALLBACK;
         // UARTCC26xx does not implement any of these parameters
         //    uartParams.readDataMode = UART_DATA_TEXT;
         //    uartParams.writeDataMode = UART_DATA_TEXT;
         //    uartParams.readReturnMode = UART_RETURN_NEWLINE;
         //    uartParams.readEcho = UART_ECHO_ON;
+        uartParams.writeCallback = &uartWriteCallback;
         uartHandle = UART_open(Board_UART, &uartParams);
         if (!uartHandle)
         {
@@ -80,7 +91,6 @@ static void uartOpen()
     }
 }
 
-
 /**
  * This callback is intended for the one time setup of UART,
  * in the event that USB is ever plugged in.
@@ -88,6 +98,21 @@ static void uartOpen()
 static void uartRxIntCallback(PIN_Handle handle, PIN_Id pinId)
 {
     uartOpen();
+}
+
+static void uartBufferedWrite(const char *data, size_t size) {
+    if (size == 0) return;
+
+    for (size_t start = 0; start < size; start += sizeof(uartwritebuf)) {
+        Semaphore_pend(Semaphore_handle(&uartWriteSemStruct), BIOS_WAIT_FOREVER);
+        size_t count = (size-start) < sizeof(uartwritebuf) ? (size-start) : sizeof(uartwritebuf);
+        memcpy(uartwritebuf, &data[start], count);
+        if (UART_write(uartHandle, uartwritebuf, count) == UART_ERROR)
+        {
+            System_abort("Failed to write str to uart\n");
+            // should not need to post to semaphore, since the system should terminate
+        }
+    }
 }
 
 /*--------------------------------------------------------*
@@ -101,7 +126,8 @@ bool uart_isopen()
 
 void uart_setup()
 {
-    GateMutexPri_construct(&uartMutexStruct, NULL);
+    GateMutexPri_construct(&uartWriteMutexStruct, NULL);
+    Semaphore_construct(&uartWriteSemStruct, 1, NULL);
 
     uartSensePinHandle = PIN_open(&uartSensePinState, uartSensePinTable);
     if (uartSensePinHandle == NULL)
@@ -122,12 +148,11 @@ void uart_write(const char *str, size_t size)
 {
     if (uartHandle == NULL) return;
 
-    IArg key = GateMutexPri_enter(GateMutexPri_handle(&uartMutexStruct));
-    if (UART_write(uartHandle, str, size) == UART_ERROR)
-    {
-        System_abort("Failed to write str to uart\n");
-    }
-    GateMutexPri_leave(GateMutexPri_handle(&uartMutexStruct), key);
+    IArg key = GateMutexPri_enter(GateMutexPri_handle(&uartWriteMutexStruct));
+
+    uartBufferedWrite(str, size);
+
+    GateMutexPri_leave(GateMutexPri_handle(&uartWriteMutexStruct), key);
 }
 
 /**
@@ -141,30 +166,28 @@ void uart_puts(const char *str)
 {
     if (uartHandle == NULL) return;
 
-    IArg key = GateMutexPri_enter(GateMutexPri_handle(&uartMutexStruct));
-    if (strlen(str) && UART_write(uartHandle, str, strlen(str)) == UART_ERROR)
-    {
-        System_abort("Failed to write str to uart\n");
-    }
-    if (UART_write(uartHandle, "\r\n", 2) == UART_ERROR)
-    {
-        System_abort("Failed to write CRLR to uart\n");
-    }
-    GateMutexPri_leave(GateMutexPri_handle(&uartMutexStruct), key);
+    IArg key = GateMutexPri_enter(GateMutexPri_handle(&uartWriteMutexStruct));
+
+    uartBufferedWrite(str, strlen(str));
+    uartBufferedWrite("\r\n", 2);
+
+    GateMutexPri_leave(GateMutexPri_handle(&uartWriteMutexStruct), key);
 }
 
 void uart_vprintf(const char *format, va_list args)
 {
     if (uartHandle == NULL) return;
 
-    IArg key = GateMutexPri_enter(GateMutexPri_handle(&uartMutexStruct));
-    System_vsnprintf(uartsbuf, sizeof(uartsbuf), format, args);
+    IArg key = GateMutexPri_enter(GateMutexPri_handle(&uartWriteMutexStruct));
 
-    if (UART_write(uartHandle, uartsbuf, strlen(uartsbuf)) == UART_ERROR)
+    System_vsnprintf(uartwritebuf, sizeof(uartwritebuf), format, args);
+    Semaphore_pend(Semaphore_handle(&uartWriteSemStruct), BIOS_WAIT_FOREVER);
+    if (UART_write(uartHandle, uartwritebuf, strlen(uartwritebuf)) == UART_ERROR)
     {
         System_abort("Failed to write formatted buffer to uart\n");
     }
-    GateMutexPri_leave(GateMutexPri_handle(&uartMutexStruct), key);
+
+    GateMutexPri_leave(GateMutexPri_handle(&uartWriteMutexStruct), key);
 }
 
 void uart_printf(const char *format, ...)
