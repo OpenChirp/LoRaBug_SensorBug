@@ -28,13 +28,23 @@ void setupuart();
 /*--------------------------------------------------------*
  *                  Interface Functions                   *
  *--------------------------------------------------------*/
-void uartwrite(const char *str, size_t size);
-void uartputs(const char *str);
-void uartprintf(const char *format, ...)
+
+/* uart.c */
+bool uart_isopen(void);
+void uart_write(const char *str, size_t size);
+void uart_puts(const char *str);
+void uart_printf(const char *format, ...)
     __attribute__ ((format (printf, 1, 2)));
-void uartvprintf(const char *format, va_list args)
+void uart_vprintf(const char *format, va_list args)
     __attribute__ ((format (printf, 1, 0)));
-char *uartreadline();
+char *uart_readline();
+
+/* jtag.c */
+bool jtag_ispowered(void);
+void jtag_vprintf(const char *format, va_list args)
+    __attribute__ ((format (printf, 1, 0)));
+void jtag_printf(const char *format, ...)
+    __attribute__ ((format (printf, 1, 2)));
 
 void setPin(PIN_Id pin, uint_t value);
 void togglePin(PIN_Id pin);
@@ -64,8 +74,7 @@ void allprintf(const char *format, ...)
         __attribute__ ((format (printf, 1, 2)));
 void allhexdump(uint8_t *data, size_t size);
 
-void hardreset();
-bool isjtagpoweron();
+void hardreset(void);
 
 #ifdef __cplusplus
 }

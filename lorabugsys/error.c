@@ -34,7 +34,7 @@
  * @param excContext
  */
 Void ExceptionHandle(Hwi_ExcContext *excContext) {
-    if (!isjtagpoweron()) {
+    if (!jtag_ispowered()) {
         hardreset();
     }
 }
@@ -49,7 +49,7 @@ Void ExceptionHandle(Hwi_ExcContext *excContext) {
  * @param stat The status code given to BIOS_exit or BIOS_abort
  */
 Void ExitHandler(Int stat) {
-    if (!isjtagpoweron()) {
+    if (!jtag_ispowered()) {
         hardreset();
     }
     for (;;) ;
