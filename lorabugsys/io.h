@@ -47,6 +47,7 @@ void uart_vprintf(const char *format, va_list args)
     __attribute__ ((format (printf, 1, 0)));
 char *uart_readline();
 void uart_hexdump(uint8_t *data, size_t size);
+void uart_readline_setcallback(void (*callback)(const char *buf, size_t size));
 
 /* jtag.c */
 bool jtag_ispowered(void);
