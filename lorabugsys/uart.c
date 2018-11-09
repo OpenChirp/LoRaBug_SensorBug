@@ -39,7 +39,7 @@
 /**@def READLINE_BLOCKING
  * Enable if you only intend to use the uart_readline as a blocked call
  */
-//#define READLINE_BLOCKING
+#define READLINE_BLOCKING
 
 /*--------------------------------------------------------*
  *                    State Variables                     *
@@ -58,9 +58,11 @@ static Semaphore_Struct    uartWriteSemStruct;
 
 // Buffer for snprintf and uart_write
 static char writebuf[UART_WRITE_BUFFER_SIZE];
+static char readlinebuf[UART_READ_LINE_LENGTH + 1]; // +1 for '\0'
+#ifndef READLINE_BLOCKING
 static char readbuf[1];
 static size_t readlinebufnext = 0;
-static char readlinebuf[UART_READ_LINE_LENGTH + 1]; // +1 for '\0'
+#endif
 
 static const PIN_Config uartSensePinTable[] = {
         Board_UART_RX | PIN_INPUT_EN | PIN_NOPULL | PIN_HYSTERESIS | PIN_IRQ_POSEDGE,
@@ -81,6 +83,7 @@ static void uartWriteCallback(UART_Handle handle, void *buf, size_t count) {
     Semaphore_post(Semaphore_handle(&uartWriteSemStruct));
 }
 
+#ifndef READLINE_BLOCKING
 static void uartReadCallback(UART_Handle handle, void *buf, size_t count) {
     Semaphore_post(Semaphore_handle(&uartWriteSemStruct));
 
@@ -104,6 +107,7 @@ static void uartReadCallback(UART_Handle handle, void *buf, size_t count) {
 
     UART_read(handle, readbuf, sizeof(readbuf));
 }
+#endif
 
 /**
  * @note This routine should not race with the uartsetup function because the interrupt
@@ -120,11 +124,11 @@ static void uartOpen()
         UART_Params uartParams;
         UART_Params_init(&uartParams);
         uartParams.baudRate = UART_BAUD;
-        uartParams.readMode = UART_MODE_CALLBACK;
-#ifdef READLINE_BLOCKING
-        uartParams.writeMode = UART_MODE_BLOCKING;
-#else
         uartParams.writeMode = UART_MODE_CALLBACK;
+#ifdef READLINE_BLOCKING
+        uartParams.readMode = UART_MODE_BLOCKING;
+#else
+        uartParams.readMode = UART_MODE_CALLBACK;
 #endif
         // UARTCC26xx does not implement any of these parameters
         //    uartParams.readDataMode = UART_DATA_TEXT;
