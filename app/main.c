@@ -266,7 +266,7 @@ static enum eDeviceState
     DEVICE_STATE_SEND,
     DEVICE_STATE_CYCLE,
     DEVICE_STATE_SLEEP,
-    DEVICE_STATE_BUTTON
+    DEVICE_STATE_BUTTON,
 }DeviceState;
 
 
