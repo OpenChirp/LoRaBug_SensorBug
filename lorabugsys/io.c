@@ -25,7 +25,6 @@
 //#include <ti/drivers/Watchdog.h>
 
 /* BIOS Header files */
-#include <ti/sysbios/gates/GateMutexPri.h>
 #include <ti/sysbios/knl/Clock.h>
 
 /* Non-RTOS Drivers */
@@ -359,6 +358,9 @@ void phexdump(printf_t prnf, uint8_t *data, size_t size)
  * Printf to UART and JTAG
  *
  * @note This CANNOT be used in a Hwi or Swi (pin callbacks included), since this function blocks in uart
+ *
+ * @todo This can be optimized to only do the printf style formatting once and then write the buffer to
+ *       both outputs.
  */
 void allprintf(const char *format, ...)
 {
@@ -380,6 +382,7 @@ void allhexdump(uint8_t *data, size_t size)
 }
 
 
-inline void hardreset() {
+inline void hardreset()
+{
     SysCtrlSystemReset();
 }

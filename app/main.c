@@ -1015,7 +1015,7 @@ int main(void)
     setuppins();
 
     /* Open UART */
-    setupuart();
+    uart_setup();
 
     /* Start BIOS */
     BIOS_start();

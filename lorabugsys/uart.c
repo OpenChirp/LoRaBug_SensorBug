@@ -94,11 +94,12 @@ static void uartRxIntCallback(PIN_Handle handle, PIN_Id pinId)
  *                  Interface Functions                   *
  *--------------------------------------------------------*/
 
-bool uart_isopen() {
+bool uart_isopen()
+{
     return uartHandle != NULL;
 }
 
-void setupuart()
+void uart_setup()
 {
     GateMutexPri_construct(&uartMutexStruct, NULL);
 
