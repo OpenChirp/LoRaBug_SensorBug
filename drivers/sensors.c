@@ -159,7 +159,7 @@ void setupBMI(bool enabled) {
 
     rslt = bmi160_init(&sensor);
     if(rslt != BMI160_OK){
-        uartprintf("BMI Init fail\r\n");
+        debugprintf("BMI Init fail\r\n");
         return;
     }
 
@@ -175,7 +175,7 @@ void setupBMI(bool enabled) {
     /*  Set the Power mode  */
     rslt = bmi160_set_power_mode(&sensor);
     if(rslt != BMI160_OK){
-        uartprintf("BMI fail setting power\r\n");
+        debugprintf("BMI fail setting power\r\n");
         return;
     }
 
@@ -205,7 +205,7 @@ void setupBMI(bool enabled) {
     rslt = set_accel_any_motion_int(&int_config, &sensor);
 
     if(rslt != BMI160_OK){
-        uartprintf("BMI fail setting Any-motion interrupt\r\n");
+        debugprintf("BMI fail setting Any-motion interrupt\r\n");
         return;
     }
 
