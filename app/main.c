@@ -919,8 +919,8 @@ void maintask(UArg arg0, UArg arg1)
 #endif
                 // Wake up through events
                 UInt events = Event_pend(runtimeEvents, Event_Id_NONE, EVENT_STATECHANGE|EVENT_BUTTONPRESSED, BIOS_WAIT_FOREVER);
-                // If only button press event (priority to STATECHANGE)
-                if (events == EVENT_BUTTONPRESSED) {
+                // If button press event (priority to BUTTONPRESSED)
+                if (events & EVENT_BUTTONPRESSED) {
                     DeviceState = DEVICE_STATE_BUTTON;
                 }
                 break;
