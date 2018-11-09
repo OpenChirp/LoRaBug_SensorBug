@@ -54,7 +54,7 @@ static const PIN_Config uartSensePinTable[] = {
  * @note This routine should not race with the uartsetup function because the interrupt
  *       is only registered after we decide not to call uart_open.
  */
-static void uart_open()
+static void uartOpen()
 {
     if (uartHandle == NULL)
     {
@@ -87,7 +87,7 @@ static void uart_open()
  */
 static void uartRxIntCallback(PIN_Handle handle, PIN_Id pinId)
 {
-    uart_open();
+    uartOpen();
 }
 
 /*--------------------------------------------------------*
@@ -111,7 +111,7 @@ void uart_setup()
 
     int val = PIN_getInputValue(PIN_ID(Board_UART_RX));
     if (val == 1) {
-        uart_open();
+        uartOpen();
     } else {
         PIN_registerIntCb(uartSensePinHandle, uartRxIntCallback);
     }
