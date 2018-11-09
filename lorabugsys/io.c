@@ -320,7 +320,7 @@ void phexdump(printf_t prnf, uint8_t *data, size_t size)
     ascii[16] = '\0';
     for (i = 0; i < size; ++i)
     {
-        prnf("%02X ", ((unsigned char*) data)[i]);
+        prnf("%02x ", ((unsigned char*) data)[i]);
         if (((unsigned char*) data)[i] >= ' '
                 && ((unsigned char*) data)[i] <= '~')
         {
