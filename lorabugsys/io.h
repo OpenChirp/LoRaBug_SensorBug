@@ -29,7 +29,7 @@ void setupuart();
  *                  Interface Functions                   *
  *--------------------------------------------------------*/
 
-/* Utiities */
+/* Utilities */
 typedef void printf_t(const char *format, ...)
 __attribute__ ((format (printf, 1, 2)));
 
@@ -56,6 +56,7 @@ void jtag_printf(const char *format, ...)
     __attribute__ ((format (printf, 1, 2)));
 void jtag_hexdump(uint8_t *data, size_t size);
 
+/* io.c */
 void setPin(PIN_Id pin, uint_t value);
 void togglePin(PIN_Id pin);
 int  getPinInput(PIN_Id pin);
