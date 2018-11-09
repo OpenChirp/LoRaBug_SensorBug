@@ -30,6 +30,10 @@ void setupuart();
  *--------------------------------------------------------*/
 
 /* Utiities */
+typedef void printf_t(const char *format, ...)
+__attribute__ ((format (printf, 1, 2)));
+
+void phexdump(printf_t prnf, uint8_t *data, size_t size);
 
 void hardreset(void);
 
@@ -42,6 +46,7 @@ void uart_printf(const char *format, ...)
 void uart_vprintf(const char *format, va_list args)
     __attribute__ ((format (printf, 1, 0)));
 char *uart_readline();
+void uart_hexdump(uint8_t *data, size_t size);
 
 /* jtag.c */
 bool jtag_ispowered(void);
@@ -49,6 +54,7 @@ void jtag_vprintf(const char *format, va_list args)
     __attribute__ ((format (printf, 1, 0)));
 void jtag_printf(const char *format, ...)
     __attribute__ ((format (printf, 1, 2)));
+void jtag_hexdump(uint8_t *data, size_t size);
 
 void setPin(PIN_Id pin, uint_t value);
 void togglePin(PIN_Id pin);
@@ -67,9 +73,6 @@ void timedLed(PIN_Id pin, unsigned ms);
 
 int getButtonState();
 void setBtnCallback(void (*callback)(void));
-
-void hexdump(uint8_t *data, size_t size);
-void uarthexdump(uint8_t *data, size_t size);
 
 /**
  * Printf to UART and JTAG

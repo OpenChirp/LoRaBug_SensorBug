@@ -34,3 +34,8 @@ void jtag_printf(const char *format, ...)
     jtag_vprintf(format, args);
     va_end(args);
 }
+
+void jtag_hexdump(uint8_t *data, size_t size)
+{
+    phexdump(jtag_printf, data, size);
+}

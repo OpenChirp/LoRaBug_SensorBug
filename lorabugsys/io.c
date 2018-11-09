@@ -312,10 +312,7 @@ void setBtnCallback(void (*callback)(void))
 
 /* Utilities */
 
-typedef void printf_t(const char *format, ...)
-__attribute__ ((format (printf, 1, 2)));
-
-static void _hexdump(printf_t prnf, uint8_t *data, size_t size)
+void phexdump(printf_t prnf, uint8_t *data, size_t size)
 {
     // Stolen from https://gist.github.com/ccbrown/9722406
     char ascii[17];
@@ -357,16 +354,6 @@ static void _hexdump(printf_t prnf, uint8_t *data, size_t size)
     }
 }
 
-void hexdump(uint8_t *data, size_t size)
-{
-    _hexdump(jtag_printf, data, size);
-}
-
-void uarthexdump(uint8_t *data, size_t size)
-{
-    _hexdump(uart_printf, data, size);
-}
-
 
 /**
  * Printf to UART and JTAG
@@ -389,8 +376,7 @@ void allprintf(const char *format, ...)
 
 void allhexdump(uint8_t *data, size_t size)
 {
-    hexdump(data, size);
-    uarthexdump(data, size);
+    phexdump(allprintf, data, size);
 }
 
 

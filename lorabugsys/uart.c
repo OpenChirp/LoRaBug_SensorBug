@@ -189,3 +189,8 @@ char *uart_readline()
     uartlinebuf[index] = '\0';
     return uartlinebuf;
 }
+
+void uart_hexdump(uint8_t *data, size_t size)
+{
+    phexdump(uart_printf, data, size);
+}
