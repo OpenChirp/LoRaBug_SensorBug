@@ -344,14 +344,15 @@ static void PrepareTxFrame( uint8_t port )
         if (Settings.mic_enabled)
             bmeSched = 2;
 
-
-
         if (Settings.light_enabled || Settings.mic_enabled) {
+            Uint32 timeSlept = 0;
             // Enable Light/MIC Power
             setPin(DOMAIN1_EN, DOMAIN1_ON);
-            // Wait for MIC and Light sensor to stabilize
-            Task_sleep(MYMAX(MIC_STABILIZE_TIME_US, LIGHT_STABILIZE_TIME_US) / Clock_tickPeriod);
             if (Settings.light_enabled) {
+                // Wait for Light sensor to stabilize
+                Uint32 stabilizeTime = LIGHT_STABILIZE_TIME_US / Clock_tickPeriod;
+                Task_sleep(stabilizeTime);
+                timeSlept += stabilizeTime;
                 sampleLightStart();
                 if (bmeSched == 1) {
                     bmeData = getBME();
@@ -360,6 +361,10 @@ static void PrepareTxFrame( uint8_t port )
             }
             // MIC takes a while to stabilize, whereas the light sensor is ready within 90us
             if (Settings.mic_enabled) {
+                Uint32 stabilizeTime = MIC_STABILIZE_TIME_US / Clock_tickPeriod;
+                stabilizeTime -= stabilizeTime>timeSlept ? timeSlept : stabilizeTime;
+                // Wait for MIC sensor to stabilize
+                Task_sleep(stabilizeTime);
                 sampleNoiseStart();
                 if (bmeSched == 2) {
                     bmeData = getBME();
