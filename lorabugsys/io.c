@@ -368,7 +368,8 @@ void allprintf(const char *format, ...)
     va_start(args, format);
 
     // Print to JTAG debugger
-    // System_vprintf only consumes about 144 bytes stack space, whereas vprintf consumes 1,300 bytes
+    // System_vprintf only consumes about 144 bytes stack
+    // space, whereas vprintf consumes 1,300 bytes
     jtag_vprintf(format, args);
     // Print to UART console
     uart_vprintf(format, args);
