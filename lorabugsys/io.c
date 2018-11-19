@@ -383,7 +383,7 @@ void allhexdump(uint8_t *data, size_t size)
 }
 
 
-inline void hardreset()
+void hardreset()
 {
     SysCtrlSystemReset();
 }

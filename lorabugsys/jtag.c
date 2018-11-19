@@ -4,6 +4,7 @@
  * @author Craig Hesling
  */
 
+#include <stdbool.h>
 #include "io.h"
 
 /* XDCtools Header files */
@@ -13,7 +14,7 @@
 /* Non-RTOS Drivers */
 #include <driverlib/aon_wuc.h>  // AONWUCPowerStatusGet() & AONWUC_JTAG_POWER_ON
 
-inline bool jtag_ispowered() {
+bool jtag_ispowered(void) {
     return (AONWUCPowerStatusGet()&AONWUC_JTAG_POWER_ON) != 0;
 }
 void jtag_write(const char *str, size_t size)

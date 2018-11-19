@@ -71,7 +71,6 @@ Void AbortHandler() {
  * Get the current timestamp
  * @param[out] time The
  */
-inline
 void TimestampNow(Types_Timestamp64 *time) {
     Timestamp_get64(time);
 }
@@ -86,7 +85,6 @@ void TimestampNow(Types_Timestamp64 *time) {
  * @param[in] after The later time we should consider for the difference
  * @return True if no overflow occurred. False if an overflow occurred.
  */
-inline
 bool TimestampDiffNs(uint64_t *nanoseconds, Types_Timestamp64 *before, Types_Timestamp64 *after) {
     /// @note The overflow return value does not currently work.
     /// @todo Implement the part by part multi and addition to check for overflows
