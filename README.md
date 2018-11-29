@@ -32,7 +32,7 @@ See [app/main.c](app/main.c) for more information.
 # Cloning and Submodules
 
 ```
-git clone https://github.com/OpenChirp/LoRaBug_BlinkySleep.git
+git clone https://github.com/OpenChirp/LoRaBug_SensorBug.git
 git submodule update --init --recursive
 ```
 
