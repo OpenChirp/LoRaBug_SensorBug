@@ -130,6 +130,12 @@ const uint32_t software_ver_minor = 3;
  */
 //#define CALIBRATION_MODE_NOISE
 
+/**@def CALIBRATION_MODE_PREPAREFRAME
+ * When set, the main task will continuously call PrepareTxFrame
+ * in an effort to shake out problems in the sensor gathering routine.
+ */
+//#define CALIBRATION_MODE_PREPAREFRAME
+
 /*------------------------------------------------------------------------*/
 /*                          Convenience                                   */
 /*------------------------------------------------------------------------*/
@@ -738,7 +744,7 @@ static void printLorawanCred() {
 
 
 /* Define Calibration Functions */
-#if defined(CALIBRATION_MODE_LIGHT) || defined(CALIBRATION_MODE_NOISE)
+#if defined(CALIBRATION_MODE_LIGHT) || defined(CALIBRATION_MODE_NOISE) || defined(CALIBRATION_MODE_PREPAREFRAME)
 static void lightCalibration() {
     debugprintf("Sampling Light\r\n");
     sampleLightStart();
@@ -771,6 +777,12 @@ static void calibrationMode() {
 #       endif
 #       ifdef CALIBRATION_MODE_NOISE
         noiseCalibration();
+#       endif
+#       ifdef CALIBRATION_MODE_PREPAREFRAME
+        setLed(Board_RLED, 1);
+        PrepareTxFrame( AppPort );
+        setLed(Board_RLED, 0);
+        Task_sleep(100000 / Clock_tickPeriod);
 #       endif
 
     }// while(true)
@@ -805,7 +817,7 @@ void maintask(UArg arg0, UArg arg1)
     ble_set_eui_payload(DevEui, AppKey);
 #endif
 
-#if defined(CALIBRATION_MODE_LIGHT) || defined(CALIBRATION_MODE_NOISE)
+#if defined(CALIBRATION_MODE_LIGHT) || defined(CALIBRATION_MODE_NOISE) || defined(CALIBRATION_MODE_PREPAREFRAME)
     calibrationMode();
 #endif
 
