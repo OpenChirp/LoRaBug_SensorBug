@@ -516,6 +516,9 @@ const ADCBuf_Config ADCBuf_config[] = {
     {&ADCBufCC26XX_fxnTable, &adcBufCC26xxObjects[0], &adcBufCC26xxHWAttrs[0]},
     {NULL, NULL, NULL},
 };
+
+const uint_least8_t ADCBuf_count = LORABUG_ADCBufCOUNT;
+
 /*
  *  ========================== ADCBuf end =========================================
  */
@@ -644,6 +647,8 @@ const ADC_Config ADC_config[] = {
     {&ADCCC26XX_fxnTable, &adcCC26xxObjects[10], &adcCC26xxHWAttrs[10]},
     {NULL, NULL, NULL},
 };
+
+const uint_least8_t ADC_count = LORABUG_ADCCOUNT;
 
 /*
  *  ========================== ADC end =========================================
