@@ -59,7 +59,7 @@ static Event_Handle runtimeEvents;
 
 // Software Version 2.1
 const uint32_t software_ver_major = 2;
-const uint32_t software_ver_minor = 2;
+const uint32_t software_ver_minor = 3;
 
 /*------------------------------------------------------------------------*/
 /*                     Configuration                                      */
