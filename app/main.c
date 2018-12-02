@@ -874,6 +874,11 @@ void maintask(UArg arg0, UArg arg1)
                 }
                 DeviceState = DEVICE_STATE_SLEEP;
 #else
+
+#               ifdef DISABLE_LEDS
+                disableLeds();
+#               endif
+
                 // Choose a random device address if not already defined in Commissioning.h
                 if( DevAddr == 0 )
                 {
