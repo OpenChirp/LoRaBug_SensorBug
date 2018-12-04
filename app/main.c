@@ -116,7 +116,7 @@ const uint32_t software_ver_minor = 3;
  * When defined, the watchdog will be setup and used.
  * Please check the default duration(in ms) in LORABUG.c .
  */
-//#define WATCHDOG_ENABLED
+#define WATCHDOG_ENABLED
 
 /**@def CALIBRATION_MODE_LIGHT
  * When set, the main task will continuously call the sampleLight
@@ -1034,11 +1034,13 @@ int main(void)
 
     /* Setup watchdog */
 #ifdef WATCHDOG_ENABLED
+    Watchdog_Params watchdogParam;
+    Watchdog_Params_init(&watchdogParam);
     // Default Functionality:
     // * HardReset when watchdog is upset
     // * Allow stalling the watchdog when debugger is at breakpoint
     // * No callback
-    watchdog = Watchdog_open(LORABUG_WATCHDOG0, NULL);
+    watchdog = Watchdog_open(LORABUG_WATCHDOG0, &watchdogParam);
     if (watchdog == NULL) {
         System_abort("Failed to open watchdog");
     }

@@ -668,11 +668,20 @@ const uint_least8_t ADC_count = LORABUG_ADCCOUNT;
 
 WatchdogCC26XX_Object watchdogCC26XXObjects[LORABUG_WATCHDOGCOUNT];
 
+/* The absolute maximum value for reloadValue is 2,863,311ms,
+ * which is 47.72185mins.
+ *
+ * This values comes from 0xFFFFFFFF / (ClockFreq(48MHz) / WATCHDOG_DIV_RATIO(32) / 1000).
+ * See WatchdogCC26XX_convertMsToTicks in WatchdogCC26XX.c for more information.
+ *
+ * Note that the watchdog is only counting down when the CPU is active (when the 48MHz clock running).
+ * So, this can be chosen based on the maximum stretch of active time.
+ */
 const WatchdogCC26XX_HWAttrs watchdogCC26XXHWAttrs[LORABUG_WATCHDOGCOUNT] = {
     {
         .baseAddr = WDT_BASE,
         .intNum = INT_WDT_IRQ,
-        .reloadValue = 5*1000 /* Reload value in milliseconds - (=5 sec) */
+        .reloadValue = 60000 /* Reload value in milliseconds - (=1 mins) */
     },
 };
 
