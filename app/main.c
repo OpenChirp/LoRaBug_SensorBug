@@ -59,7 +59,7 @@ static Event_Handle runtimeEvents;
 
 // Software Version 2.1
 const uint32_t software_ver_major = 2;
-const uint32_t software_ver_minor = 3;
+const uint32_t software_ver_minor = 4;
 
 /*------------------------------------------------------------------------*/
 /*                     Configuration                                      */
@@ -400,6 +400,7 @@ static void PrepareTxFrame( uint8_t port )
         msg.motion_en      = Settings.motion_enabled;
         msg.light_en       = Settings.light_enabled;
         msg.mic_en         = Settings.mic_enabled;
+        msg.reset_source   = (ResetSource)resetsource();
         // Version info should probably only be sent once on join
         msg.sw_version_major = software_ver_major;
         msg.sw_version_minor = software_ver_minor;
@@ -418,6 +419,7 @@ static void PrepareTxFrame( uint8_t port )
         msg.has_motion_en = true;
         msg.has_light_en = true;
         msg.has_mic_en = true;
+        msg.has_reset_source = true;
         msg.has_sw_version_major = true;
         msg.has_sw_version_minor = true;
 
