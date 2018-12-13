@@ -118,6 +118,13 @@ const uint32_t software_ver_minor = 4;
  */
 #define WATCHDOG_ENABLED
 
+/**@def AUTOUART_ENABLED
+ * When defined, the uart subsystem will be configured
+ * to automatically enable uart communication when USB
+ * power is detected.
+ */
+//#define AUTOUART_ENABLED
+
 /**@def CALIBRATION_MODE_LIGHT
  * When set, the main task will continuously call the sampleLight
  * function and print it's results using \a debugprintf.
@@ -1052,8 +1059,10 @@ int main(void)
     /* Open and setup pins */
     setuppins();
 
-    /* Open UART */
+#ifdef AUTOUART_ENABLED
+    /* Setup Automatic UART */
     uart_setup();
+#endif
 
     /* Start BIOS */
     BIOS_start();
