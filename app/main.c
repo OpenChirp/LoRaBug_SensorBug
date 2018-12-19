@@ -57,9 +57,9 @@ static Char mainTaskStack[TASKSTACKSIZE];
 static Event_Struct runtimeEventsStruct;
 static Event_Handle runtimeEvents;
 
-// Software Version 2.1
+// Software Version 2.7
 const uint32_t software_ver_major = 2;
-const uint32_t software_ver_minor = 4;
+const uint32_t software_ver_minor = 7;
 
 /*------------------------------------------------------------------------*/
 /*                     Configuration                                      */
