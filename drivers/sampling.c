@@ -148,9 +148,10 @@ static void micReduce(uint32_t microVoltReading) {
     sampleSum += val;
     int64_t square = int_square((int64_t)val - (int64_t)lastMICAvg);
     // Check for overflow
-    if (sampleSquaredSum > (sampleSquaredSum+square)) {
+    if (sampleSquaredSum>(sampleSquaredSum+square) || sampleSquaredSum==((uint64_t)-1)) {
         sampleSquaredSum = (uint64_t)-1;
-        System_abort("Overflow detected in sample noise");
+//        System_abort("Overflow detected in sample noise");
+        return;
     }
     sampleSquaredSum += square;
 }
@@ -244,6 +245,10 @@ void sampleNoiseStart() {
 uint32_t sampleNoiseWaitResult() {
     Event_pend(adcEvents, Event_Id_NONE, EVENT_SAMPLING_FINISHED, BIOS_WAIT_FOREVER);
     ADCBuf_close(adcBuf);
+
+    if (sampleSquaredSum == ((uint64_t)-1)) {
+        return 0;
+    }
 
     uint32_t avg =  sampleSum / MIC_SAMPLING_COUNT;
     uint32_t newavg = (lastMICAvg + avg) / 2;
