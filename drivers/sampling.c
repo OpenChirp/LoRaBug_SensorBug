@@ -243,6 +243,8 @@ void sampleNoiseStart() {
  */
 uint32_t sampleNoiseWaitResult() {
     Event_pend(adcEvents, Event_Id_NONE, EVENT_SAMPLING_FINISHED, BIOS_WAIT_FOREVER);
+    ADCBuf_close(adcBuf);
+
     uint32_t avg =  sampleSum / MIC_SAMPLING_COUNT;
     uint32_t newavg = (lastMICAvg + avg) / 2;
 
@@ -255,8 +257,6 @@ uint32_t sampleNoiseWaitResult() {
     uint64_t variance = sampleSquaredSum / MIC_SAMPLING_COUNT;
     uint32_t stddev = int_sqrt64(variance);
     debugprintf("MIC STDDEV = %d\n", stddev);
-
-    ADCBuf_close(adcBuf);
 
     return stddev / 1000;
 }
@@ -318,11 +318,11 @@ void sampleLightStart() {
  */
 uint32_t sampleLightWaitResult() {
     Event_pend(adcEvents, Event_Id_NONE, EVENT_SAMPLING_FINISHED, BIOS_WAIT_FOREVER);
+    ADCBuf_close(adcBuf);
+
     uint64_t avg =  sampleSum / LIGHT_SAMPLING_COUNT;
 
     debugprintf("Light AVG = %llu = %f V\n", avg, ((double)avg)/1000.0/1000.0);
-
-    ADCBuf_close(adcBuf);
 
     return microVoltsToMilliLux(avg);
 }
