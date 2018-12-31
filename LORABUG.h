@@ -55,6 +55,7 @@ extern "C" {
  *  Externs
  *  ==========================================================================*/
 extern const PIN_Config BoardGpioInitTable[];
+void LORABUG_initUDMA(void);
 
 /** ============================================================================
  *  Defines
@@ -326,6 +327,7 @@ typedef enum LORABUG_WatchdogName {
 }
 
 #define     Board_initGPIO()
+#define     Board_initUDMA()        LORABUG_initUDMA() // must be done before peripherals
 #define     Board_initPWM()         PWM_init()
 #define     Board_initI2C()         I2C_init()
 #define     Board_initSPI()         SPI_init()

@@ -202,6 +202,11 @@ const UDMACC26XX_Config UDMACC26XX_config[] = {
     },
     {NULL, NULL}
 };
+
+void LORABUG_initUDMA() {
+    UDMACC26XX_init((UDMACC26XX_Handle)&(UDMACC26XX_config[0]));
+}
+
 /*
  *  ============================= UDMA end =====================================
  */

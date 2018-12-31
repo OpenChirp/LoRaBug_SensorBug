@@ -1027,6 +1027,7 @@ int main(void)
 
     /* Call board init functions */
     Board_initGeneral();
+    Board_initUDMA();
     Board_initI2C();
     Board_initSPI();
     Board_initUART();
