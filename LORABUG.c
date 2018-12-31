@@ -504,8 +504,8 @@ const ADCBufCC26XX_AdcChannelLutEntry ADCBufCC26XX_adcChannelLut[] = {
 
 const ADCBufCC26XX_HWAttrs adcBufCC26xxHWAttrs[LORABUG_ADCBufCOUNT] = {
     {
-        .intPriority = ~0,
-        .swiPriority = 0,
+        .intPriority = 1<<5,
+        .swiPriority = 5,
         .adcChannelLut = ADCBufCC26XX_adcChannelLut,
         .gpTimerUnit = Board_GPTIMER0A,
         .gptDMAChannelMask = 1 << UDMA_CHAN_TIMER0_A,
