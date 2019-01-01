@@ -32,8 +32,7 @@
 
 /*
  *  ====================== LORABUG.c ===================================
- *  This file is responsible for setting up the board specific items for the
- *  CC2650 LaunchPad.
+ *  This file is responsible for setting up TI_RTOS drivers.
  */
 
 
