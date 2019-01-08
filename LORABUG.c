@@ -271,6 +271,9 @@ const SPI_Config SPI_config[] = {
     },
     {NULL, NULL, NULL}
 };
+
+const uint_least8_t SPI_count = LORABUG_SPICOUNT;
+
 /*
  *  ========================== SPI DMA end =====================================
 */
