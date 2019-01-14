@@ -586,6 +586,8 @@ static void McpsConfirm( McpsConfirm_t *mcpsConfirm )
         }
 
         setLed(Board_GLED, 0);
+    } else {
+        debugprintf("# --> Error\n");
     }
     NextTx = true;
     Event_post(runtimeEvents, EVENT_STATECHANGE);
