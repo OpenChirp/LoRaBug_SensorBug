@@ -455,6 +455,7 @@ static void PrepareTxFrame( uint8_t port )
         }
 
         debugprintf("Total Packet Size: %d bytes\r\n", AppDataSize);
+        debugflush();
     }
         break;
     default:
