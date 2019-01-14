@@ -50,13 +50,13 @@
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}}"/>
 									<listOptionValue builtIn="false" value="${COM_TI_RTSC_TIRTOSCC13XX_CC26XX_INSTALL_DIR}/products/cc26xxware_2_24_03_17272"/>
 									<listOptionValue builtIn="false" value="${CG_TOOL_ROOT}/include"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/lorabugsys}&quot;"/>
+									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/lorabugsys}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/loramac/src/radio}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/loramac/src/system/crypto}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/loramac/src/boards/LoRaBug}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/loramac/src/mac}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/drivers}"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/easybits}&quot;"/>
+									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/easybits}"/>
 								</option>
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_18.1.compilerID.LITTLE_ENDIAN.2115265254" name="Little endian code [See 'General' page to edit] (--little_endian, -me)" superClass="com.ti.ccstudio.buildDefinitions.TMS470_18.1.compilerID.LITTLE_ENDIAN" useByScannerDiscovery="false" value="true" valueType="boolean"/>
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_18.1.compilerID.DEFINE.341614911" name="Pre-define NAME (--define, -D)" superClass="com.ti.ccstudio.buildDefinitions.TMS470_18.1.compilerID.DEFINE" valueType="definedSymbols">
