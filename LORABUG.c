@@ -556,7 +556,8 @@ const ADCCC26XX_HWAttrs adcCC26xxHWAttrs[LORABUG_ADCCOUNT] = {
         .refSource = ADCCC26XX_FIXED_REFERENCE,
         .samplingDuration = ADCCC26XX_SAMPLING_DURATION_2P7_US,
         .inputScalingEnabled = true,
-        .triggerSource = ADCCC26XX_TRIGGER_MANUAL
+        .triggerSource = ADCCC26XX_TRIGGER_MANUAL,
+        .returnAdjustedVal = false // false=>compensate in convertToMicroVolts, true=>compensate in convert
     },
     {
         .adcDIO = Board_HDR_ADIO1,
@@ -564,7 +565,8 @@ const ADCCC26XX_HWAttrs adcCC26xxHWAttrs[LORABUG_ADCCOUNT] = {
         .refSource = ADCCC26XX_FIXED_REFERENCE,
         .samplingDuration = ADCCC26XX_SAMPLING_DURATION_2P7_US,
         .inputScalingEnabled = true,
-        .triggerSource = ADCCC26XX_TRIGGER_MANUAL
+        .triggerSource = ADCCC26XX_TRIGGER_MANUAL,
+        .returnAdjustedVal = false // false=>compensate in convertToMicroVolts, true=>compensate in convert
     },
     {
         .adcDIO = Board_HDR_ADIO2,
@@ -572,7 +574,8 @@ const ADCCC26XX_HWAttrs adcCC26xxHWAttrs[LORABUG_ADCCOUNT] = {
         .refSource = ADCCC26XX_FIXED_REFERENCE,
         .samplingDuration = ADCCC26XX_SAMPLING_DURATION_2P7_US,
         .inputScalingEnabled = true,
-        .triggerSource = ADCCC26XX_TRIGGER_MANUAL
+        .triggerSource = ADCCC26XX_TRIGGER_MANUAL,
+        .returnAdjustedVal = false // false=>compensate in convertToMicroVolts, true=>compensate in convert
     },
     {
         .adcDIO = Board_HDR_ADIO3,
@@ -580,7 +583,8 @@ const ADCCC26XX_HWAttrs adcCC26xxHWAttrs[LORABUG_ADCCOUNT] = {
         .refSource = ADCCC26XX_FIXED_REFERENCE,
         .samplingDuration = ADCCC26XX_SAMPLING_DURATION_2P7_US,
         .inputScalingEnabled = true,
-        .triggerSource = ADCCC26XX_TRIGGER_MANUAL
+        .triggerSource = ADCCC26XX_TRIGGER_MANUAL,
+        .returnAdjustedVal = false // false=>compensate in convertToMicroVolts, true=>compensate in convert
     },
     {
         .adcDIO = Board_HDR_ADIO4,
@@ -588,7 +592,8 @@ const ADCCC26XX_HWAttrs adcCC26xxHWAttrs[LORABUG_ADCCOUNT] = {
         .refSource = ADCCC26XX_FIXED_REFERENCE,
         .samplingDuration = ADCCC26XX_SAMPLING_DURATION_2P7_US,
         .inputScalingEnabled = true,
-        .triggerSource = ADCCC26XX_TRIGGER_MANUAL
+        .triggerSource = ADCCC26XX_TRIGGER_MANUAL,
+        .returnAdjustedVal = false // false=>compensate in convertToMicroVolts, true=>compensate in convert
     },
     {
         .adcDIO = Board_HDR_ADIO5,
@@ -596,7 +601,8 @@ const ADCCC26XX_HWAttrs adcCC26xxHWAttrs[LORABUG_ADCCOUNT] = {
         .refSource = ADCCC26XX_FIXED_REFERENCE,
         .samplingDuration = ADCCC26XX_SAMPLING_DURATION_2P7_US,
         .inputScalingEnabled = true,
-        .triggerSource = ADCCC26XX_TRIGGER_MANUAL
+        .triggerSource = ADCCC26XX_TRIGGER_MANUAL,
+        .returnAdjustedVal = false // false=>compensate in convertToMicroVolts, true=>compensate in convert
     },
     {
         .adcDIO = Board_HDR_ADIO6,
@@ -604,7 +610,8 @@ const ADCCC26XX_HWAttrs adcCC26xxHWAttrs[LORABUG_ADCCOUNT] = {
         .refSource = ADCCC26XX_FIXED_REFERENCE,
         .samplingDuration = ADCCC26XX_SAMPLING_DURATION_2P7_US,
         .inputScalingEnabled = true,
-        .triggerSource = ADCCC26XX_TRIGGER_MANUAL
+        .triggerSource = ADCCC26XX_TRIGGER_MANUAL,
+        .returnAdjustedVal = false // false=>compensate in convertToMicroVolts, true=>compensate in convert
     },
     {
         .adcDIO = Board_HDR_ADIO7,
@@ -612,7 +619,8 @@ const ADCCC26XX_HWAttrs adcCC26xxHWAttrs[LORABUG_ADCCOUNT] = {
         .refSource = ADCCC26XX_FIXED_REFERENCE,
         .samplingDuration = ADCCC26XX_SAMPLING_DURATION_10P9_MS,
         .inputScalingEnabled = true,
-        .triggerSource = ADCCC26XX_TRIGGER_MANUAL
+        .triggerSource = ADCCC26XX_TRIGGER_MANUAL,
+        .returnAdjustedVal = false // false=>compensate in convertToMicroVolts, true=>compensate in convert
     },
     {
         .adcDIO = PIN_UNASSIGNED,
@@ -620,7 +628,8 @@ const ADCCC26XX_HWAttrs adcCC26xxHWAttrs[LORABUG_ADCCOUNT] = {
         .refSource = ADCCC26XX_FIXED_REFERENCE,
         .samplingDuration = ADCCC26XX_SAMPLING_DURATION_2P7_US,
         .inputScalingEnabled = true,
-        .triggerSource = ADCCC26XX_TRIGGER_MANUAL
+        .triggerSource = ADCCC26XX_TRIGGER_MANUAL,
+        .returnAdjustedVal = false // false=>compensate in convertToMicroVolts, true=>compensate in convert
     },
     {
         .adcDIO = PIN_UNASSIGNED,
@@ -628,7 +637,8 @@ const ADCCC26XX_HWAttrs adcCC26xxHWAttrs[LORABUG_ADCCOUNT] = {
         .refSource = ADCCC26XX_FIXED_REFERENCE,
         .samplingDuration = ADCCC26XX_SAMPLING_DURATION_2P7_US,
         .inputScalingEnabled = true,
-        .triggerSource = ADCCC26XX_TRIGGER_MANUAL
+        .triggerSource = ADCCC26XX_TRIGGER_MANUAL,
+        .returnAdjustedVal = false // false=>compensate in convertToMicroVolts, true=>compensate in convert
     },
     {
         .adcDIO = PIN_UNASSIGNED,
@@ -636,7 +646,8 @@ const ADCCC26XX_HWAttrs adcCC26xxHWAttrs[LORABUG_ADCCOUNT] = {
         .refSource = ADCCC26XX_FIXED_REFERENCE,
         .samplingDuration = ADCCC26XX_SAMPLING_DURATION_2P7_US,
         .inputScalingEnabled = true,
-        .triggerSource = ADCCC26XX_TRIGGER_MANUAL
+        .triggerSource = ADCCC26XX_TRIGGER_MANUAL,
+        .returnAdjustedVal = false // false=>compensate in convertToMicroVolts, true=>compensate in convert
     }
 };
 
