@@ -617,7 +617,7 @@ const ADCCC26XX_HWAttrs adcCC26xxHWAttrs[LORABUG_ADCCOUNT] = {
         .adcDIO = Board_HDR_ADIO7,
         .adcCompBInput = ADC_COMPB_IN_AUXIO0,
         .refSource = ADCCC26XX_FIXED_REFERENCE,
-        .samplingDuration = ADCCC26XX_SAMPLING_DURATION_10P9_MS,
+        .samplingDuration = ADCCC26XX_SAMPLING_DURATION_2P7_US,
         .inputScalingEnabled = true,
         .triggerSource = ADCCC26XX_TRIGGER_MANUAL,
         .returnAdjustedVal = false // false=>compensate in convertToMicroVolts, true=>compensate in convert
