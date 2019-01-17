@@ -564,7 +564,7 @@ static void McpsConfirm( McpsConfirm_t *mcpsConfirm )
             {
                 // Check Datarate
                 // Check TxPower
-                debugprintf("# Got McpsConfirm: MCPS_UNCONFIRMED\n");
+                debugprintf("# --> MCPS_UNCONFIRMED\n");
                 break;
             }
             case MCPS_CONFIRMED:
@@ -573,7 +573,7 @@ static void McpsConfirm( McpsConfirm_t *mcpsConfirm )
                 // Check TxPower
                 // Check AckReceived
                 // Check NbTrials
-                debugprintf("# Got McpsConfirm: MCPS_CONFIRMED\n");
+                debugprintf("# --> MCPS_CONFIRMED\n");
                 debugprintf("# --> AckReceived: %s\n", mcpsConfirm->AckReceived?"Yes":"No");
                 debugprintf("# --> NbTrials: %u\n", mcpsConfirm->NbRetries);
                 break;
