@@ -7,10 +7,11 @@
 #include <xdc/runtime/System.h>
 #include <ti/sysbios/BIOS.h> // BIOS_WAIT_FOREVER
 #include <ti/sysbios/knl/Event.h>
+#include <ti/sysbios/knl/Task.h>
+#include <ti/sysbios/knl/Clock.h>
 
 /* TI-RTOS drivers */
-#include <ti/drivers/ADCBuf.h>
-#include <ti/drivers/adcbuf/ADCBufCC26XX.h>
+#include <ti/drivers/ADC.h>
 
 #include <PERIPHERALS.h>
 #include <io.h>
@@ -66,17 +67,11 @@ uint32_t int_sqrt64(uint64_t x) // 780 µs
  *                    Setup Variable                      *
  *--------------------------------------------------------*/
 
-static ADCBuf_Handle adcBuf;
-static ADCBuf_Params adcBufParams;
-static ADCBuf_Conversion continuousConversion;
-static uint16_t sampleBufferOne[ADCBUFFERSIZE];
-static uint16_t sampleBufferTwo[ADCBUFFERSIZE];
-static uint32_t microVoltBuffer[ADCBUFFERSIZE];
-static uint32_t samplesCountdown = 0;
+static ADC_Handle adc;
 
-#define EVENT_SAMPLING_FINISHED Event_Id_00
-static Event_Struct adcEventsStruct;
-static Event_Handle adcEvents;
+//#define EVENT_SAMPLING_FINISHED Event_Id_00
+//static Event_Struct adcEventsStruct;
+//static Event_Handle adcEvents;
 
 #define MIN(x,y) ( ((x) < (y)) ? (x) : (y) )
 
@@ -95,48 +90,6 @@ volatile uint64_t periodNs;   // inspect with debugger
 /*--------------------------------------------------------*
  *                    Local Functions                     *
  *--------------------------------------------------------*/
-
-/*
- * This function is called whenever a buffer is full.
- * The content of the buffer is then converted into human-readable format and
- * sent to the PC via UART.
- *
- */
-static void adcBufCallback(ADCBuf_Handle handle, ADCBuf_Conversion *conversion, void *completedADCBuffer, uint32_t completedChannel) {
-#ifdef ENABLE_TIMING_MEASUREMENTS
-    TimestampNow(&start);
-#endif
-
-    uint_fast16_t i, sampleCount;
-    if (samplesCountdown <= ADCBUFFERSIZE) {
-        ADCBuf_convertCancel(handle);
-        sampleCount = samplesCountdown;
-        samplesCountdown = 0;
-    } else {
-        sampleCount = ADCBUFFERSIZE;
-        samplesCountdown -= ADCBUFFERSIZE;
-    }
-
-    /* Adjust raw adc values and convert them to microvolts */
-    ADCBuf_adjustRawValues(handle, completedADCBuffer, sampleCount, completedChannel);
-    ADCBuf_convertAdjustedToMicroVolts(handle, completedChannel, completedADCBuffer, microVoltBuffer, sampleCount);
-
-    void (*reduce)(uint32_t microVoltReadin) = (void (*)(uint32_t))conversion->arg;
-    for (i = 0; i < sampleCount; i++) {
-        reduce(microVoltBuffer[i]);
-    }
-
-    if (samplesCountdown == 0) {
-        Event_post(adcEvents, EVENT_SAMPLING_FINISHED);
-    }
-
-#ifdef ENABLE_TIMING_MEASUREMENTS
-    TimestampNow(&end);
-    TimestampDiffNs(&durationNs, &start, &end);
-    TimestampDiffNs(&periodNs, &lastStart, &start);
-    lastStart = start;
-#endif
-}
 
 static uint64_t sampleSum;
 static uint64_t sampleSquaredSum;
@@ -186,8 +139,8 @@ uint32_t microVoltsToMilliLux(uint32_t uV) {
  *--------------------------------------------------------*/
 
 void sampleInit() {
-    Event_construct(&adcEventsStruct, NULL);
-    adcEvents = Event_handle(&adcEventsStruct);
+//    Event_construct(&adcEventsStruct, NULL);
+//    adcEvents = Event_handle(&adcEventsStruct);
 }
 
 
@@ -198,44 +151,41 @@ void sampleInit() {
 void sampleNoiseStart() {
     debugprintf("Sampling Noise\r\n");
 
-    /* Set up an ADCBuf peripheral in ADCBuf_RECURRENCE_MODE_CONTINUOUS */
-    ADCBufCC26XX_ParamsExtension adcCustomParams = {
-        .inputScalingEnabled = true,
-        .refSource = ADCBufCC26XX_FIXED_REFERENCE,
-        .samplingMode = ADCBufCC26XX_SAMPING_MODE_ASYNCHRONOUS,
-//        .samplingMode = ADCBufCC26XX_SAMPING_MODE_SYNCHRONOUS,
-//        .samplingDuration = ADCBufCC26XX_SAMPLING_DURATION_21P3_US,
-    };
+    ADC_Params adcParams;
+    uint16_t adcValue;
+    uint32_t adcValueMicoVolt;
+    int count;
+    const uint32_t sleepticks =  ((1000*1000) / MIC_SAMPLING_FREQ) / Clock_tickPeriod;
 
-    ADCBuf_Params_init(&adcBufParams);
-    adcBufParams.callbackFxn = adcBufCallback;
-    adcBufParams.recurrenceMode = ADCBuf_RECURRENCE_MODE_CONTINUOUS;
-    adcBufParams.returnMode = ADCBuf_RETURN_MODE_CALLBACK;
-    adcBufParams.samplingFrequency = MIC_SAMPLING_FREQ;
-    adcBufParams.custom = &adcCustomParams;
-    adcBuf = ADCBuf_open(Board_ADCBuf0, &adcBufParams);
+    sampleSum = 0;
+
+    ADC_Params_init(&adcParams);
 
 
-    /* Configure the conversion struct */
-    continuousConversion.arg = (void *)micReduce;
-    continuousConversion.adcChannel = ADC_INDEX_MIC;
-    continuousConversion.sampleBuffer = sampleBufferOne;
-    continuousConversion.sampleBufferTwo = sampleBufferTwo;
-    continuousConversion.samplesRequestedCount = ADCBUFFERSIZE;
-
-    if (!adcBuf){
-        System_abort("adcBuf did not open correctly\n");
+    adc = ADC_open(ADC_INDEX_MIC, &adcParams);
+    if (adc == NULL) {
+        System_abort("Failed to open ADC for MIC\n");
     }
 
-    samplesCountdown = MIC_SAMPLING_COUNT;
-    sampleSum        = 0;
-    sampleSquaredSum = 0;
-
-
-    /* Start converting. */
-    if (ADCBuf_convert(adcBuf, &continuousConversion, 1) != ADCBuf_STATUS_SUCCESS) {
-        System_abort("Did not start conversion process correctly\n");
+    for (count = 0; count < MIC_SAMPLING_COUNT; count++) {
+        if (ADC_convert(adc, &adcValue) != ADC_STATUS_SUCCESS) {
+            System_abort("Failed to convert ADC value for MIC\n");
+        }
+        adcValueMicoVolt = ADC_convertToMicroVolts(adc, adcValue);
+#ifdef ENABLE_TIMING_MEASUREMENTS
+        TimestampNow(&start);
+#endif
+        micReduce(adcValueMicoVolt);
+#ifdef ENABLE_TIMING_MEASUREMENTS
+        TimestampNow(&end);
+        TimestampDiffNs(&durationNs, &start, &end);
+        TimestampDiffNs(&periodNs, &lastStart, &start);
+        lastStart = start;
+#endif
+        Task_sleep(sleepticks);
     }
+
+    ADC_close(adc);
 }
 
 /**
@@ -243,8 +193,8 @@ void sampleNoiseStart() {
  * @return The RMS in millivolts
  */
 uint32_t sampleNoiseWaitResult() {
-    Event_pend(adcEvents, Event_Id_NONE, EVENT_SAMPLING_FINISHED, BIOS_WAIT_FOREVER);
-    ADCBuf_close(adcBuf);
+//    Event_pend(adcEvents, Event_Id_NONE, EVENT_SAMPLING_FINISHED, BIOS_WAIT_FOREVER);
+//    ADCBuf_close(adcBuf);
 
     if (sampleSquaredSum == ((uint64_t)-1)) {
         return 0;
@@ -273,57 +223,40 @@ uint32_t sampleNoiseWaitResult() {
 void sampleLightStart() {
     debugprintf("Sampling Light\r\n");
 
-    /* Set up an ADCBuf peripheral in ADCBuf_RECURRENCE_MODE_CONTINUOUS */
-    ADCBufCC26XX_ParamsExtension adcCustomParams = {
-        .inputScalingEnabled = true,
-        .refSource = ADCBufCC26XX_FIXED_REFERENCE,
-        .samplingMode = ADCBufCC26XX_SAMPING_MODE_ASYNCHRONOUS,
-//        .samplingDuration = ADCBufCC26XX_SAMPLING_DURATION_42P6_US,
-    };
+    ADC_Params adcParams;
+    uint16_t adcValue;
+    uint32_t adcValueMicoVolt;
+    int count;
+    const uint32_t sleepticks =  ((1000*1000) / LIGHT_SAMPLING_FREQ) / Clock_tickPeriod;
 
-    ADCBuf_Params_init(&adcBufParams);
-    adcBufParams.callbackFxn = adcBufCallback;
-    if (LIGHT_SAMPLING_COUNT <= ADCBUFFERSIZE) {
-        adcBufParams.recurrenceMode = ADCBuf_RECURRENCE_MODE_ONE_SHOT;
-    } else {
-        adcBufParams.recurrenceMode = ADCBuf_RECURRENCE_MODE_CONTINUOUS;
-    }
-    adcBufParams.returnMode = ADCBuf_RETURN_MODE_CALLBACK;
-    adcBufParams.samplingFrequency = LIGHT_SAMPLING_FREQ;
-    adcBufParams.custom = &adcCustomParams;
-    adcBuf = ADCBuf_open(Board_ADCBuf0, &adcBufParams);
+    sampleSum = 0;
+
+    ADC_Params_init(&adcParams);
 
 
-    /* Configure the conversion struct */
-    continuousConversion.arg = (void *)sumReduce;
-    continuousConversion.adcChannel = ADC_INDEX_LUX;
-    continuousConversion.sampleBuffer = sampleBufferOne;
-    continuousConversion.sampleBufferTwo = sampleBufferTwo;
-    if (LIGHT_SAMPLING_COUNT < ADCBUFFERSIZE) {
-        continuousConversion.samplesRequestedCount = LIGHT_SAMPLING_COUNT;
-    } else {
-        continuousConversion.samplesRequestedCount = ADCBUFFERSIZE;
+    adc = ADC_open(ADC_INDEX_LUX, &adcParams);
+    if (adc == NULL) {
+        System_abort("Failed to open ADC for light\n");
     }
 
-    if (!adcBuf){
-        System_abort("adcBuf did not open correctly\n");
+    for (count = 0; count < LIGHT_SAMPLING_COUNT; count++) {
+        if (ADC_convert(adc, &adcValue) != ADC_STATUS_SUCCESS) {
+            System_abort("Failed to convert ADC value for light\n");
+        }
+        adcValueMicoVolt = ADC_convertToMicroVolts(adc, adcValue);
+        sumReduce(adcValueMicoVolt);
+        Task_sleep(sleepticks);
     }
 
-    samplesCountdown = LIGHT_SAMPLING_COUNT;
-    sampleSum        = 0;
-
-    /* Start converting. */
-    if (ADCBuf_convert(adcBuf, &continuousConversion, 1) != ADCBuf_STATUS_SUCCESS) {
-        System_abort("Did not start conversion process correctly\n");
-    }
+    ADC_close(adc);
 }
 
 /**
  * @return The average in millilux
  */
 uint32_t sampleLightWaitResult() {
-    Event_pend(adcEvents, Event_Id_NONE, EVENT_SAMPLING_FINISHED, BIOS_WAIT_FOREVER);
-    ADCBuf_close(adcBuf);
+//    Event_pend(adcEvents, Event_Id_NONE, EVENT_SAMPLING_FINISHED, BIOS_WAIT_FOREVER);
+//    ADCBuf_close(adcBuf);
 
     uint64_t avg =  sampleSum / LIGHT_SAMPLING_COUNT;
 
