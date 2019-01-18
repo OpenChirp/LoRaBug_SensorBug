@@ -157,7 +157,8 @@ void sampleNoiseStart() {
     int count;
     const uint32_t sleepticks =  ((1000*1000) / MIC_SAMPLING_FREQ) / Clock_tickPeriod;
 
-    sampleSum = 0;
+    sampleSum        = 0;
+    sampleSquaredSum = 0;
 
     ADC_Params_init(&adcParams);
 
