@@ -27,10 +27,9 @@ int8_t user_i2c_read(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint16
 
     rslt = -1;
 
+    I2C_Params_init(&i2cParams);
     i2cParams.bitRate = I2C_400kHz;
     i2cParams.transferMode = I2C_MODE_BLOCKING;
-
-    I2C_Params_init(&i2cParams);
     i2cHandle = I2C_open(Board_I2C, &i2cParams);
 
     if (i2cHandle) {
@@ -62,10 +61,9 @@ int8_t user_i2c_write(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint1
         return rslt;
     }
 
+    I2C_Params_init(&i2cParams);
     i2cParams.bitRate = I2C_400kHz;
     i2cParams.transferMode = I2C_MODE_BLOCKING;
-
-    I2C_Params_init(&i2cParams);
     i2cHandle = I2C_open(Board_I2C, &i2cParams);
 
     if (i2cHandle) {
