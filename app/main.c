@@ -118,6 +118,19 @@ const uint32_t software_ver_minor = 12;
  */
 #define WATCHDOG_ENABLED
 
+/**@def SEND_ERR_COUNT_RESET
+ * When defined, a reset will be issued if the number of SendFrameErrors
+ * reaches the specified count.
+ * Note that these send errors will continue to increase when the LoRaWAN stack
+ * is still attempting retries in the background. They only could the continuous failes to start a new send job.
+ * They are reset when a sendframe succeeds in starting a new send job.
+ *
+ * Example:
+ * Say you specify 6 as the SEND_ERR_COUNT_RESET with a reporting interval of 10 seconds.
+ * Then, you would see a maximum of 60 seconds of failures before a reset was issued.
+ */
+#define SEND_ERR_COUNT_RESET 6
+
 /**@def AUTOUART_ENABLED
  * When defined, the uart subsystem will be configured
  * to automatically enable uart communication when USB
@@ -263,6 +276,13 @@ static TimerEvent_t TxNextPacketTimer;
  * Indicates if a new packet can be sent
  */
 static bool NextTx = true;
+
+/*!
+ * Counts the number of times SendFrame returned an error.
+ * This count may include failures because retries are already being attempted.
+ * They only monitor the number of continuous failures to start a new send job.
+ */
+static unsigned SendFrameErrors = 0;
 
 /*!
  * Allow the user to schedule a packet to send immediately when we join
@@ -933,6 +953,17 @@ void maintask(UArg arg0, UArg arg1)
                 {
                     PrepareTxFrame( AppPort );
                     NextTx = SendFrame( );
+                    if (NextTx) {
+                        SendFrameErrors++;
+#ifdef SEND_ERR_COUNT_RESET
+                        if (SendFrameErrors >= (SEND_ERR_COUNT_RESET)) {
+                            debugprintf("# Exceeded SEND_ERR_COUNT_RESET -- Resetting\n");
+                            hardreset();
+                        }
+#endif
+                    } else {
+                        SendFrameErrors = 0;
+                    }
                 }
 
                 DeviceState = DEVICE_STATE_CYCLE;
