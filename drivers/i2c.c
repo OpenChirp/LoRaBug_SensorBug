@@ -91,5 +91,5 @@ int8_t user_i2c_write(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint1
 
 void user_delay_ms(uint32_t period)
 {
-	Task_sleep(((period) * 1000) / Clock_tickPeriod);
+    Task_sleep((period * 1000) / Clock_tickPeriod);
 }
