@@ -25,29 +25,28 @@ static uint8_t* txBuf;
 
 int8_t user_i2c_read(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint16_t len) {
 
-	rslt = 0;
+    rslt = -1;
 
-	i2cParams.bitRate = I2C_400kHz;
-	i2cParams.transferMode = I2C_MODE_BLOCKING;
+    i2cParams.bitRate = I2C_400kHz;
+    i2cParams.transferMode = I2C_MODE_BLOCKING;
 
-	I2C_Params_init(&i2cParams);
-	i2cHandle = I2C_open(Board_I2C, &i2cParams);
+    I2C_Params_init(&i2cParams);
+    i2cHandle = I2C_open(Board_I2C, &i2cParams);
 
-	if(!i2cHandle) {
-        rslt = -1;
-    } else {
-    	i2cTransaction.slaveAddress = dev_id;
-    	i2cTransaction.writeBuf = &reg_addr;
-    	i2cTransaction.writeCount = 1;
-    	i2cTransaction.readBuf = reg_data;
-    	i2cTransaction.readCount = len;
+    if (i2cHandle) {
+        i2cTransaction.slaveAddress = dev_id;
+        i2cTransaction.writeBuf = &reg_addr;
+        i2cTransaction.writeCount = 1;
+        i2cTransaction.readBuf = reg_data;
+        i2cTransaction.readCount = len;
 
-    	if(!I2C_transfer(i2cHandle, &i2cTransaction)) {
-    		rslt = -1;
-    	}
+        if(I2C_transfer(i2cHandle, &i2cTransaction)) {
+            rslt = 0;
+        }
+
+        I2C_close(i2cHandle);
     }
 
-	I2C_close(i2cHandle);
     return rslt;
 }
 
@@ -55,37 +54,40 @@ int8_t user_i2c_read(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint16
 
 int8_t user_i2c_write(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint16_t len) {
 
-	rslt = 0;
-	txBuf = malloc((len + 1) * sizeof(uint8_t));
+    rslt = -1;
 
-	i2cParams.bitRate = I2C_400kHz;
-	i2cParams.transferMode = I2C_MODE_BLOCKING;
+    txBuf = malloc((len + 1) * sizeof(uint8_t));
 
-	I2C_Params_init(&i2cParams);
-	i2cHandle = I2C_open(Board_I2C, &i2cParams);
+    if (txBuf == NULL) {
+        return rslt;
+    }
 
-	if (i2cHandle == NULL) {
-		rslt = -1;
-	} else {
-		i2cTransaction.slaveAddress = dev_id;
-		i2cTransaction.writeBuf = txBuf;
-		i2cTransaction.writeCount = len + 1;
-		i2cTransaction.readBuf = NULL;
-		i2cTransaction.readCount = 0;
-		txBuf[0] = reg_addr;
+    i2cParams.bitRate = I2C_400kHz;
+    i2cParams.transferMode = I2C_MODE_BLOCKING;
 
-		for(int j = 0; j < len; j++) {
-			txBuf[1 + j] = reg_data[j];
-		}
+    I2C_Params_init(&i2cParams);
+    i2cHandle = I2C_open(Board_I2C, &i2cParams);
 
-		if(!I2C_transfer(i2cHandle, &i2cTransaction)) {
-			rslt = -1;
-		}
-	}
+    if (i2cHandle) {
+        i2cTransaction.slaveAddress = dev_id;
+        i2cTransaction.writeBuf = txBuf;
+        i2cTransaction.writeCount = len + 1;
+        i2cTransaction.readBuf = NULL;
+        i2cTransaction.readCount = 0;
+        txBuf[0] = reg_addr;
 
-	I2C_close(i2cHandle);
-	free(txBuf);
-	return rslt;
+        for(int j = 0; j < len; j++) {
+            txBuf[1 + j] = reg_data[j];
+        }
+
+        if(I2C_transfer(i2cHandle, &i2cTransaction)) {
+            rslt = 0;
+        }
+        I2C_close(i2cHandle);
+    }
+
+    free(txBuf);
+    return rslt;
 }
 
 
